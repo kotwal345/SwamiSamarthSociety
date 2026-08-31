@@ -1,0 +1,85 @@
+@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Sign in";
+    Layout = "/Views/Shared/_AuthLayout.cshtml";
+}
+
+<div class="auth-shell">
+    <div class="auth-brand">
+        <div>
+            <div class="auth-brand-mark">S</div>
+            <div class="auth-brand-title">Shri Swami Samarth<br />Sahakari Society</div>
+            <div class="auth-brand-devanagari">सभासद व्यवस्थापन प्रणाली</div>
+            <div class="auth-brand-subtitle">Sign in to manage members, monthly shares, loans and society accounts in one place.</div>
+        </div>
+        <ul class="auth-brand-features">
+            <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+                Member &amp; share records in one place
+            </li>
+            <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+                Loan &amp; installment tracking
+            </li>
+            <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+                Secure, role-based access
+            </li>
+        </ul>
+        <div class="auth-brand-footer">&copy; @DateTime.Now.Year SwamiSamarthSociety.Web</div>
+    </div>
+
+    <div class="auth-form-panel">
+        <div class="auth-form-header">
+            <h1>Welcome back</h1>
+            <p>Sign in to continue to your society dashboard.</p>
+        </div>
+
+        <div asp-validation-summary="ModelOnly" class="auth-summary" role="alert"></div>
+
+        <form id="account" method="post">
+            <input type="hidden" asp-for="ReturnUrl" />
+
+            <div class="auth-field">
+                <input asp-for="Input.Email" class="form-control" autocomplete="username" placeholder=" " />
+                <svg class="auth-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4h16v16H4z" opacity="0" />
+                    <path d="M4 6h16v12H4z" />
+                    <path d="m4 7 8 6 8-6" />
+                </svg>
+                <label asp-for="Input.Email">Email address</label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <div class="auth-field">
+                <input asp-for="Input.Password" id="Input_Password" class="form-control" autocomplete="current-password" placeholder=" " />
+                <svg class="auth-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="5" y="11" width="14" height="9" rx="2" />
+                    <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+                </svg>
+                <label asp-for="Input.Password">Password</label>
+                <button type="button" class="auth-toggle-visibility" data-target="Input_Password" aria-label="Show password">
+                    <svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" /><circle cx="12" cy="12" r="3" /></svg>
+                    <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.6 21.6 0 0 1 5.06-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 7 11 7a21.6 21.6 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" /><path d="M1 1l22 22" /></svg>
+                </button>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+
+            <div class="auth-row-between">
+                <label class="auth-checkbox">
+                    <input asp-for="Input.RememberMe" type="checkbox" />
+                    Remember me
+                </label>
+                <a asp-area="Identity" asp-page="/Account/ForgotPassword">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="auth-submit">Sign in</button>
+        </form>
+
+        <div class="auth-switch">
+            New to the society? <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Create an account</a>
+        </div>
+    </div>
+</div>

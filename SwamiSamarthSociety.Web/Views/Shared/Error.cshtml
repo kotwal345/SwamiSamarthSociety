@@ -1,0 +1,23 @@
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="page-header">
+    <div>
+        <span class="page-eyebrow">Something went wrong</span>
+        <h1>An error occurred</h1>
+        <p class="page-subtitle">Please try again, or head back to the dashboard.</p>
+    </div>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Back to Dashboard</a>
+</div>
+
+<div class="panel panel-pad">
+    @if (Model.ShowRequestId)
+    {
+        <p><strong>Request ID:</strong> <code class="member-code">@Model.RequestId</code></p>
+    }
+    <p class="text-muted mb-0">
+        If this keeps happening, please contact the society administrator with the request ID above.
+    </p>
+</div>

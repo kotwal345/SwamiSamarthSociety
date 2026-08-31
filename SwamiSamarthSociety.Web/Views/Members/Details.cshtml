@@ -1,0 +1,51 @@
+@model SwamiSamarthSociety.Data.Entities.Member
+@{
+    ViewData["Title"] = "Member Details";
+}
+
+<div class="page-header">
+    <div>
+        <span class="page-eyebrow">सभासद यादी</span>
+        <h1>Member Profile</h1>
+        <p class="page-subtitle">Full details for this society member.</p>
+    </div>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.MemberId" class="btn btn-outline-secondary">Edit Member</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back to list</a>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="profile-header">
+        <span class="profile-avatar">@Model.FullName.Substring(0, 1).ToUpper()</span>
+        <div>
+            <h1>@Model.FullName</h1>
+            <div class="profile-code">
+                <code class="member-code">@Model.MemberCode</code>
+                <span class="badge @(Model.Status == "Active" ? "bg-success" : "bg-secondary") ms-2">@Model.Status</span>
+            </div>
+        </div>
+    </div>
+    <dl class="detail-grid">
+        <div class="detail-item">
+            <dt>Mobile Number</dt>
+            <dd>@(string.IsNullOrWhiteSpace(Model.MobileNumber) ? "—" : Model.MobileNumber)</dd>
+        </div>
+        <div class="detail-item">
+            <dt>Address</dt>
+            <dd>@(string.IsNullOrWhiteSpace(Model.Address) ? "—" : Model.Address)</dd>
+        </div>
+        <div class="detail-item">
+            <dt>Joining Date</dt>
+            <dd>@Model.JoiningDate.ToString("dd-MMM-yyyy")</dd>
+        </div>
+        <div class="detail-item">
+            <dt>Monthly Share Amount</dt>
+            <dd>₹@Model.MonthlyShareAmount.ToString("N0")</dd>
+        </div>
+        <div class="detail-item">
+            <dt>Cumulative Share</dt>
+            <dd>₹@ViewBag.CumulativeShare</dd>
+        </div>
+    </dl>
+</div>

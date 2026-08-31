@@ -1,0 +1,78 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="page-header">
+    <div>
+        <span class="page-eyebrow">Welcome back</span>
+        <h1>Society Dashboard</h1>
+        <p class="page-subtitle">A quick look at your society's membership.</p>
+    </div>
+    <a asp-controller="Members" asp-action="Create" class="btn btn-primary">+ Add Member</a>
+</div>
+
+<div class="stat-row">
+    <div class="stat-tile accent-primary">
+        <div class="stat-value">@Model.TotalMembers</div>
+        <div class="stat-label">Total Members</div>
+    </div>
+    <div class="stat-tile accent-success">
+        <div class="stat-value">@Model.ActiveMembers</div>
+        <div class="stat-label">Active Members</div>
+    </div>
+    <div class="stat-tile accent-muted">
+        <div class="stat-value">@Model.InactiveMembers</div>
+        <div class="stat-label">Inactive / Left</div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="form-panel-header">
+        <h1>Recently Joined</h1>
+        <p>The last few members added to the society.</p>
+    </div>
+
+    @if (Model.RecentMembers.Count == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+            <h3>No members yet</h3>
+            <p>Add your first society member to get started.</p>
+            <a asp-controller="Members" asp-action="Create" class="btn btn-primary mt-2">+ Add Member</a>
+        </div>
+    }
+    else
+    {
+        <div class="table-panel" style="border:none;border-radius:0;box-shadow:none;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Member</th>
+                        <th>Code</th>
+                        <th>Joined</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var m in Model.RecentMembers)
+                    {
+                        <tr>
+                            <td>
+                                <div class="cell-name">
+                                    <span class="member-avatar">@m.FullName.Substring(0, 1).ToUpper()</span>
+                                    <span class="cell-name-text">@m.FullName</span>
+                                </div>
+                            </td>
+                            <td><code class="member-code">@m.MemberCode</code></td>
+                            <td>@m.JoiningDate.ToString("dd-MMM-yyyy")</td>
+                            <td><span class="badge @(m.Status == "Active" ? "bg-success" : "bg-secondary")">@m.Status</span></td>
+                            <td><a asp-controller="Members" asp-action="Details" asp-route-id="@m.MemberId" class="btn btn-sm btn-outline-primary">View</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

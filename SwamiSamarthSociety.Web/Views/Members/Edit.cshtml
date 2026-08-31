@@ -1,0 +1,52 @@
+@model SwamiSamarthSociety.Data.Entities.Member
+@{
+    ViewData["Title"] = "Edit Member";
+}
+
+<div class="page-header">
+    <div>
+        <span class="page-eyebrow">सभासद यादी</span>
+        <h1>Edit Member</h1>
+        <p class="page-subtitle">Updating <code class="member-code">@Model.MemberCode</code> — @Model.FullName</p>
+    </div>
+</div>
+
+<div class="panel" style="max-width: 760px;">
+    <div class="form-panel-header">
+        <h1>Member details</h1>
+        <p>Update the information below and save your changes.</p>
+    </div>
+    <form asp-action="Edit" asp-route-id="@Model.MemberId" method="post" class="panel-pad">
+        <input type="hidden" asp-for="MemberId" />
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+        <div class="form-grid">
+            <div class="form-field form-field-full">
+                <label class="form-label">Full Name *</label>
+                <input asp-for="FullName" class="form-control" required />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Mobile Number</label>
+                <input asp-for="MobileNumber" class="form-control" />
+            </div>
+            <div class="form-field">
+                <label class="form-label">Status</label>
+                <select asp-for="Status" class="form-select">
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Left">Left</option>
+                </select>
+            </div>
+            <div class="form-field form-field-full">
+                <label class="form-label">Address</label>
+                <textarea asp-for="Address" class="form-control" rows="2"></textarea>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Update</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
