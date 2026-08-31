@@ -1,0 +1,33 @@
+@{
+    ViewData["Title"] = "Open Next Cycle";
+    int year = ViewBag.Year;
+    int month = ViewBag.Month;
+    decimal openingBankBalance = ViewBag.OpeningBankBalance;
+    string[] monthNames = { "", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+}
+
+<div class="page-header">
+    <div>
+        <span class="page-eyebrow">मासिक हप्ता</span>
+        <h1>Open Next Cycle</h1>
+        <p class="page-subtitle">This will create the collection sheet for the next month.</p>
+    </div>
+</div>
+
+<div class="panel" style="max-width: 520px;">
+    <div class="form-panel-header">
+        <h1>@monthNames[month] @year</h1>
+        <p>Every active member will get a share row; members with an active loan will also get an installment row.</p>
+    </div>
+    <form asp-action="OpenNextCycle" method="post" class="panel-pad">
+        <div class="form-field">
+            <label class="form-label">Opening Bank Balance</label>
+            <input name="openingBankBalance" type="number" step="0.01" class="form-control" value="@openingBankBalance" />
+            <span class="form-text-hint">Pre-filled from the previous cycle's closing balance. Adjust if needed.</span>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Open Cycle</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+</div>

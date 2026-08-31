@@ -35,6 +35,12 @@
                             <a class="nav-link @(currentController == "Members" ? "active" : "")" asp-area="" asp-controller="Members" asp-action="Index">Members</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link @(currentController == "Loans" ? "active" : "")" asp-area="" asp-controller="Loans" asp-action="Index">Loans</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(currentController == "MonthlyCycles" ? "active" : "")" asp-area="" asp-controller="MonthlyCycles" asp-action="Index">Collection</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
@@ -60,6 +66,8 @@
             <div class="site-footer-links">
                 <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                 <a asp-area="" asp-controller="Members" asp-action="Index">Members</a>
+                <a asp-area="" asp-controller="Loans" asp-action="Index">Loans</a>
+                <a asp-area="" asp-controller="MonthlyCycles" asp-action="Index">Collection</a>
             </div>
         </div>
     </footer>

@@ -24,6 +24,9 @@ public class Program
         builder.Services.AddScoped<IMemberService, MemberService>();
         builder.Services.AddScoped<IInterestCalculationService, InterestCalculationService>();
         builder.Services.AddScoped<IInstallmentCalculationService, InstallmentCalculationService>();
+        builder.Services.AddScoped<ILoanService, LoanService>();
+        builder.Services.AddScoped<IMonthlyCycleService, MonthlyCycleService>();
+        builder.Services.AddScoped<IPaymentCollectionService, PaymentCollectionService>();
 
         builder.Services.AddControllersWithViews();
 

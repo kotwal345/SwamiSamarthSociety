@@ -1,0 +1,77 @@
+@model LoanCreateViewModel
+@{
+    ViewData["Title"] = "New Loan";
+}
+
+<div class="page-header">
+    <div>
+        <span class="page-eyebrow">कर्ज</span>
+        <h1>New Loan</h1>
+        <p class="page-subtitle">Issue a loan to an active member.</p>
+    </div>
+</div>
+
+<div class="panel" style="max-width: 760px;">
+    <div class="form-panel-header">
+        <h1>Loan details</h1>
+        <p>Exactly @Model.GuarantorsRequired guarantor(s) must be selected.</p>
+    </div>
+    <form asp-action="Create" method="post" class="panel-pad">
+        <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+        <div class="form-grid">
+            <div class="form-field form-field-full">
+                <label class="form-label">Borrower *</label>
+                <select asp-for="MemberId" class="form-select">
+                    <option value="">— Select member —</option>
+                    @foreach (var m in Model.BorrowerCandidates)
+                    {
+                        <option value="@m.MemberId">@m.FullName (@m.MemberCode)</option>
+                    }
+                </select>
+                @if (Model.BorrowerCandidates.Count == 0)
+                {
+                    <span class="form-text-hint">No members are eligible — every active member already has an active loan.</span>
+                }
+                <span asp-validation-for="MemberId" class="text-danger"></span>
+            </div>
+
+            <div class="form-field">
+                <label class="form-label">Loan Amount *</label>
+                <input asp-for="OriginalLoanAmount" class="form-control" placeholder="e.g. 10000" />
+                <span asp-validation-for="OriginalLoanAmount" class="text-danger"></span>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Loan Date *</label>
+                <input asp-for="LoanDate" type="date" class="form-control" />
+            </div>
+            <div class="form-field">
+                <label class="form-label">Interest Rate (% / month)</label>
+                <input asp-for="InterestRate" class="form-control" />
+            </div>
+
+            <div class="form-field form-field-full">
+                <label class="form-label">Guarantors * (select @Model.GuarantorsRequired)</label>
+                <div class="panel" style="padding: 12px 16px; max-height: 220px; overflow-y: auto;">
+                    @foreach (var m in Model.GuarantorCandidates)
+                    {
+                        <div class="auth-checkbox" style="margin-bottom: 6px;">
+                            <input type="checkbox" name="GuarantorMemberIds" value="@m.MemberId" id="guarantor-@m.MemberId" />
+                            <label for="guarantor-@m.MemberId">@m.FullName (@m.MemberCode)</label>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="form-field form-field-full">
+                <label class="form-label">Remarks</label>
+                <textarea asp-for="Remarks" class="form-control" rows="2"></textarea>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create Loan</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+</div>

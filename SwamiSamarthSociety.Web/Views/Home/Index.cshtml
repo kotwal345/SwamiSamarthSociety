@@ -1,15 +1,86 @@
 @model DashboardViewModel
 @{
     ViewData["Title"] = "Dashboard";
+    string[] monthNames = { "", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+    string[] monthNamesFull = { "", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+
+    string SinceLabel()
+    {
+        if (Model.FirstCycleMonth is null) return "—";
+        return $"{monthNamesFull[Model.FirstCycleMonth.Value]} {Model.FirstCycleYear}";
+    }
+
+    string RunningLabel()
+    {
+        if (Model.FirstCycleYear is null || Model.LatestCycleYear is null) return "No cycles run yet";
+        var totalMonths = ((Model.LatestCycleYear.Value - Model.FirstCycleYear.Value) * 12) + (Model.LatestCycleMonth!.Value - Model.FirstCycleMonth!.Value) + 1;
+        var years = totalMonths / 12;
+        var months = totalMonths % 12;
+        var parts = new List<string>();
+        if (years > 0) parts.Add($"{years} yr{(years > 1 ? "s" : "")}");
+        if (months > 0 || years == 0) parts.Add($"{months} mo{(months != 1 ? "s" : "")}");
+        return string.Join(" ", parts);
+    }
+
+    static decimal RoundUpToNice(decimal value)
+    {
+        if (value <= 0) return 100m;
+        var magnitude = 1m;
+        while (magnitude * 10 <= value) magnitude *= 10;
+        var step = magnitude / 2m; // e.g. for magnitude 1000 -> step 500
+        return Math.Ceiling(value / step) * step;
+    }
+
+    string RoundedTopRectPath(double x, double y, double w, double h, double r)
+    {
+        if (h <= 0) return "";
+        r = Math.Min(r, Math.Min(w / 2, h));
+        return FormattableString.Invariant($"M{x},{y + h} L{x},{y + r} Q{x},{y} {x + r},{y} L{x + w - r},{y} Q{x + w},{y} {x + w},{y + r} L{x + w},{y + h} Z");
+    }
+
+    // --- Chart geometry ---
+    var history = Model.MonthlyHistory;
+    var monthCount = history.Count;
+    var leftMargin = 58d;
+    var rightPad = 16d;
+    var topPad = 14d;
+    var bottomMargin = 30d;
+    var bandWidth = 54d;
+    var barWidth = 22d;
+    var plotHeight = 210d;
+    var svgWidth = leftMargin + Math.Max(monthCount, 1) * bandWidth + rightPad;
+    var svgHeight = topPad + plotHeight + bottomMargin;
+    var maxTotal = monthCount > 0 ? history.Max(h => h.Total) : 0m;
+    var yMax = RoundUpToNice(maxTotal == 0 ? 100 : maxTotal);
+    var gap = 2d; // surface gap between stacked segments
 }
 
 <div class="page-header">
     <div>
         <span class="page-eyebrow">Welcome back</span>
         <h1>Society Dashboard</h1>
-        <p class="page-subtitle">A quick look at your society's membership.</p>
+        <p class="page-subtitle">Membership and collection history at a glance.</p>
     </div>
     <a asp-controller="Members" asp-action="Create" class="btn btn-primary">+ Add Member</a>
+</div>
+
+<div class="stat-row">
+    <div class="stat-tile accent-primary">
+        <div class="stat-value">₹@Model.TotalCollectedAllTime.ToString("N0")</div>
+        <div class="stat-label">Total Collected (All-Time)</div>
+    </div>
+    <div class="stat-tile accent-success">
+        <div class="stat-value">₹@Model.TotalInterestCollected.ToString("N0")</div>
+        <div class="stat-label">Total Interest Earned</div>
+    </div>
+    <div class="stat-tile accent-accent">
+        <div class="stat-value">₹@Model.TotalPrincipalCollected.ToString("N0")</div>
+        <div class="stat-label">Loan Principal Recovered</div>
+    </div>
+    <div class="stat-tile accent-muted">
+        <div class="stat-value">₹@Model.CurrentBankBalance.ToString("N0")</div>
+        <div class="stat-label">Current Bank Balance</div>
+    </div>
 </div>
 
 <div class="stat-row">
@@ -21,11 +92,137 @@
         <div class="stat-value">@Model.ActiveMembers</div>
         <div class="stat-label">Active Members</div>
     </div>
+    <div class="stat-tile accent-accent">
+        <div class="stat-value">@Model.ActiveLoansCount</div>
+        <div class="stat-label">Active Loans · ₹@Model.TotalOutstandingPrincipal.ToString("N0") outstanding</div>
+    </div>
     <div class="stat-tile accent-muted">
-        <div class="stat-value">@Model.InactiveMembers</div>
-        <div class="stat-label">Inactive / Left</div>
+        <div class="stat-value">@Model.MonthsTracked mo</div>
+        <div class="stat-label">Tracked Since @SinceLabel() (@RunningLabel())</div>
     </div>
 </div>
+
+<div class="panel mb-3">
+    <div class="chart-card-header">
+        <div>
+            <h1>Collections by Month</h1>
+            <p>Share, loan principal and interest collected in every tracked cycle.</p>
+        </div>
+        <div class="chart-legend">
+            <span class="chart-legend-item"><span class="chart-legend-swatch" style="background:#2c4a9e;"></span>Share</span>
+            <span class="chart-legend-item"><span class="chart-legend-swatch" style="background:#e08a2c;"></span>Loan Principal</span>
+            <span class="chart-legend-item"><span class="chart-legend-swatch" style="background:#1f8a3d;"></span>Interest</span>
+        </div>
+    </div>
+
+    @if (monthCount == 0)
+    {
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18" /><path d="M7 15l4-4 3 3 5-6" /></svg>
+            <h3>No collection history yet</h3>
+            <p>Open your first monthly cycle to start tracking collections.</p>
+            <a asp-controller="MonthlyCycles" asp-action="OpenNextCycle" class="btn btn-primary mt-2">Open Next Cycle</a>
+        </div>
+    }
+    else
+    {
+        <div class="chart-wrap" id="historyChartWrap" style="overflow-x: auto;">
+            <svg class="history-chart" viewBox="0 0 @(svgWidth.ToString(System.Globalization.CultureInfo.InvariantCulture)) @(svgHeight.ToString(System.Globalization.CultureInfo.InvariantCulture))" role="img" aria-label="Monthly collections chart">
+                @{
+                    var tickCount = 4;
+                }
+                @for (int t = 0; t <= tickCount; t++)
+                {
+                    var tickValue = yMax * t / tickCount;
+                    var ty = topPad + plotHeight - (double)(tickValue / yMax) * plotHeight;
+                    <line class="grid-line" x1="@leftMargin.ToString(System.Globalization.CultureInfo.InvariantCulture)" y1="@ty.ToString(System.Globalization.CultureInfo.InvariantCulture)" x2="@svgWidth.ToString(System.Globalization.CultureInfo.InvariantCulture)" y2="@ty.ToString(System.Globalization.CultureInfo.InvariantCulture)" />
+                    @Html.Raw(FormattableString.Invariant($"<text class=\"axis-label\" x=\"{leftMargin - 8}\" y=\"{ty + 3}\" text-anchor=\"end\">₹{((int)tickValue):N0}</text>"))
+                }
+                <line class="baseline" x1="@leftMargin.ToString(System.Globalization.CultureInfo.InvariantCulture)" y1="@((topPad + plotHeight).ToString(System.Globalization.CultureInfo.InvariantCulture))" x2="@svgWidth.ToString(System.Globalization.CultureInfo.InvariantCulture)" y2="@((topPad + plotHeight).ToString(System.Globalization.CultureInfo.InvariantCulture))" />
+
+                @for (int i = 0; i < monthCount; i++)
+                {
+                    var point = history[i];
+                    var bx = leftMargin + i * bandWidth + (bandWidth - barWidth) / 2;
+                    var shareH = yMax > 0 ? (double)(point.ShareCollected / yMax) * plotHeight : 0;
+                    var principalH = yMax > 0 ? (double)(point.PrincipalCollected / yMax) * plotHeight : 0;
+                    var interestH = yMax > 0 ? (double)(point.InterestCollected / yMax) * plotHeight : 0;
+
+                    var baseline = topPad + plotHeight;
+                    var shareY = baseline - shareH;
+                    var principalY = shareY - gap - principalH;
+                    var interestY = principalY - gap - interestH;
+
+                    var monthLabel = $"{monthNames[point.Month]} {point.Year}";
+                    var monthLabelFull = $"{monthNamesFull[point.Month]} {point.Year}";
+
+                    if (shareH > 0)
+                    {
+                        var lastSegment = principalH <= 0 && interestH <= 0;
+                        <path class="bar-segment" fill="#2c4a9e" tabindex="0"
+                              d="@(lastSegment ? RoundedTopRectPath(bx, shareY, barWidth, shareH, 4) : FormattableString.Invariant($"M{bx},{shareY + shareH} L{bx},{shareY} L{bx + barWidth},{shareY} L{bx + barWidth},{shareY + shareH} Z"))"
+                              data-month="@monthLabelFull" data-series="Share" data-value="@point.ShareCollected.ToString("N0")" data-color="#2c4a9e"></path>
+                    }
+                    if (principalH > 0)
+                    {
+                        var lastSegment = interestH <= 0;
+                        <path class="bar-segment" fill="#e08a2c" tabindex="0"
+                              d="@(lastSegment ? RoundedTopRectPath(bx, principalY, barWidth, principalH, 4) : FormattableString.Invariant($"M{bx},{principalY + principalH} L{bx},{principalY} L{bx + barWidth},{principalY} L{bx + barWidth},{principalY + principalH} Z"))"
+                              data-month="@monthLabelFull" data-series="Loan Principal" data-value="@point.PrincipalCollected.ToString("N0")" data-color="#e08a2c"></path>
+                    }
+                    if (interestH > 0)
+                    {
+                        <path class="bar-segment" fill="#1f8a3d" tabindex="0"
+                              d="@RoundedTopRectPath(bx, interestY, barWidth, interestH, 4)"
+                              data-month="@monthLabelFull" data-series="Interest" data-value="@point.InterestCollected.ToString("N0")" data-color="#1f8a3d"></path>
+                    }
+                    if (shareH <= 0 && principalH <= 0 && interestH <= 0)
+                    {
+                        <rect class="bar-segment" x="@bx.ToString(System.Globalization.CultureInfo.InvariantCulture)" y="@((baseline - 2).ToString(System.Globalization.CultureInfo.InvariantCulture))" width="@barWidth.ToString(System.Globalization.CultureInfo.InvariantCulture)" height="2" fill="var(--border-strong)" tabindex="0"
+                              data-month="@monthLabelFull" data-series="No collection" data-value="0" data-color="#c3c2b7"></rect>
+                    }
+                    @Html.Raw(FormattableString.Invariant($"<text class=\"axis-label\" x=\"{bx + barWidth / 2}\" y=\"{topPad + plotHeight + 18}\" text-anchor=\"middle\">{System.Net.WebUtility.HtmlEncode(monthLabel)}</text>"))
+                }
+            </svg>
+            <div class="chart-tooltip" id="historyChartTooltip"></div>
+        </div>
+    }
+</div>
+
+@if (monthCount > 0)
+{
+    <div class="panel mb-3">
+        <div class="form-panel-header">
+            <h1>Cycle History</h1>
+            <p>Every monthly cycle tracked, oldest first.</p>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th>Status</th>
+                    <th>Share Collected</th>
+                    <th>Principal Collected</th>
+                    <th>Interest Collected</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var point in history)
+                {
+                    <tr>
+                        <td>@monthNamesFull[point.Month] @point.Year</td>
+                        <td></td>
+                        <td>₹@point.ShareCollected.ToString("N0")</td>
+                        <td>₹@point.PrincipalCollected.ToString("N0")</td>
+                        <td>₹@point.InterestCollected.ToString("N0")</td>
+                        <td><strong>₹@point.Total.ToString("N0")</strong></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
 
 <div class="panel">
     <div class="form-panel-header">
@@ -44,35 +241,97 @@
     }
     else
     {
-        <div class="table-panel" style="border:none;border-radius:0;box-shadow:none;">
-            <table class="table">
-                <thead>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Member</th>
+                    <th>Code</th>
+                    <th>Joined</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var m in Model.RecentMembers)
+                {
                     <tr>
-                        <th>Member</th>
-                        <th>Code</th>
-                        <th>Joined</th>
-                        <th>Status</th>
-                        <th></th>
+                        <td>
+                            <div class="cell-name">
+                                <span class="member-avatar">@m.FullName.Substring(0, 1).ToUpper()</span>
+                                <span class="cell-name-text">@m.FullName</span>
+                            </div>
+                        </td>
+                        <td><code class="member-code">@m.MemberCode</code></td>
+                        <td>@m.JoiningDate.ToString("dd-MMM-yyyy")</td>
+                        <td><span class="badge @(m.Status == "Active" ? "bg-success" : "bg-secondary")">@m.Status</span></td>
+                        <td><a asp-controller="Members" asp-action="Details" asp-route-id="@m.MemberId" class="btn btn-sm btn-outline-primary">View</a></td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach (var m in Model.RecentMembers)
-                    {
-                        <tr>
-                            <td>
-                                <div class="cell-name">
-                                    <span class="member-avatar">@m.FullName.Substring(0, 1).ToUpper()</span>
-                                    <span class="cell-name-text">@m.FullName</span>
-                                </div>
-                            </td>
-                            <td><code class="member-code">@m.MemberCode</code></td>
-                            <td>@m.JoiningDate.ToString("dd-MMM-yyyy")</td>
-                            <td><span class="badge @(m.Status == "Active" ? "bg-success" : "bg-secondary")">@m.Status</span></td>
-                            <td><a asp-controller="Members" asp-action="Details" asp-route-id="@m.MemberId" class="btn btn-sm btn-outline-primary">View</a></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                }
+            </tbody>
+        </table>
     }
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var tooltip = document.getElementById('historyChartTooltip');
+            var wrap = document.getElementById('historyChartWrap');
+            if (!tooltip || !wrap) return;
+
+            var segments = wrap.querySelectorAll('.bar-segment');
+            var currentMonth = null;
+
+            function showTooltip(target, evt) {
+                var month = target.getAttribute('data-month');
+                if (month !== currentMonth) {
+                    currentMonth = month;
+                    tooltip.innerHTML = '';
+                    var monthEl = document.createElement('div');
+                    monthEl.className = 'tt-month';
+                    monthEl.textContent = month;
+                    tooltip.appendChild(monthEl);
+
+                    // Show every series for this month's bar (same data-month group).
+                    var group = wrap.querySelectorAll('.bar-segment[data-month="' + CSS.escape(month) + '"]');
+                    group.forEach(function (seg) {
+                        var row = document.createElement('div');
+                        row.className = 'tt-row';
+                        var key = document.createElement('span');
+                        key.className = 'tt-key';
+                        key.style.background = seg.getAttribute('data-color');
+                        var label = document.createElement('span');
+                        label.textContent = seg.getAttribute('data-series');
+                        var value = document.createElement('span');
+                        value.className = 'tt-value';
+                        value.textContent = '₹' + seg.getAttribute('data-value');
+                        row.appendChild(key);
+                        row.appendChild(label);
+                        row.appendChild(value);
+                        tooltip.appendChild(row);
+                    });
+                }
+
+                var wrapRect = wrap.getBoundingClientRect();
+                var targetRect = target.getBoundingClientRect();
+                var x = targetRect.left - wrapRect.left + wrap.scrollLeft + targetRect.width / 2;
+                var y = targetRect.top - wrapRect.top - 10;
+                tooltip.style.left = x + 'px';
+                tooltip.style.top = y + 'px';
+                tooltip.classList.add('visible');
+            }
+
+            function hideTooltip() {
+                tooltip.classList.remove('visible');
+                currentMonth = null;
+            }
+
+            segments.forEach(function (seg) {
+                seg.addEventListener('pointerenter', function (e) { showTooltip(seg, e); });
+                seg.addEventListener('focus', function (e) { showTooltip(seg, e); });
+                seg.addEventListener('pointerleave', hideTooltip);
+                seg.addEventListener('blur', hideTooltip);
+            });
+        })();
+    </script>
+}

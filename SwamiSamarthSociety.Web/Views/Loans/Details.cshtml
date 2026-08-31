@@ -1,0 +1,111 @@
+@model SwamiSamarthSociety.Data.Entities.Loan
+@{
+    ViewData["Title"] = "Loan Details";
+}
+
+<div class="page-header">
+    <div>
+        <span class="page-eyebrow">कर्ज</span>
+        <h1>Loan @Model.LoanNumber</h1>
+        <p class="page-subtitle">Full details and installment history for this loan.</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">Back to list</a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success mb-3">@TempData["Success"]</div>
+}
+
+<div class="panel mb-3">
+    <div class="profile-header">
+        <span class="profile-avatar">@Model.Member.FullName.Substring(0, 1).ToUpper()</span>
+        <div>
+            <h1>@Model.Member.FullName</h1>
+            <div class="profile-code">
+                <code class="member-code">@Model.LoanNumber</code>
+                <span class="badge @(Model.Status == "Active" ? "bg-success" : Model.Status == "Completed" ? "bg-secondary" : "bg-warning") ms-2">@Model.Status</span>
+            </div>
+        </div>
+    </div>
+    <dl class="detail-grid">
+        <div class="detail-item">
+            <dt>Original Amount</dt>
+            <dd>₹@Model.OriginalLoanAmount.ToString("N0")</dd>
+        </div>
+        <div class="detail-item">
+            <dt>Interest Rate</dt>
+            <dd>@Model.InterestRate% / month</dd>
+        </div>
+        <div class="detail-item">
+            <dt>Outstanding Principal</dt>
+            <dd>₹@Model.OutstandingPrincipal.ToString("N0")</dd>
+        </div>
+        <div class="detail-item">
+            <dt>Total Principal Paid</dt>
+            <dd>₹@Model.TotalPrincipalPaid.ToString("N0")</dd>
+        </div>
+        <div class="detail-item">
+            <dt>Total Interest Paid</dt>
+            <dd>₹@Model.TotalInterestPaid.ToString("N0")</dd>
+        </div>
+        <div class="detail-item">
+            <dt>Loan Date</dt>
+            <dd>@Model.LoanDate.ToString("dd-MMM-yyyy")</dd>
+        </div>
+        <div class="detail-item">
+            <dt>Guarantors</dt>
+            <dd>@string.Join(", ", Model.Guarantors.Select(g => g.GuarantorMember.FullName))</dd>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(Model.Remarks))
+        {
+            <div class="detail-item">
+                <dt>Remarks</dt>
+                <dd>@Model.Remarks</dd>
+            </div>
+        }
+    </dl>
+</div>
+
+<div class="panel">
+    <div class="form-panel-header">
+        <h1>Installment History</h1>
+        <p>One row per monthly cycle this loan has been billed for.</p>
+    </div>
+    @if (Model.Installments.Count == 0)
+    {
+        <div class="empty-state">
+            <p>No installments recorded yet — this loan hasn't appeared in a monthly cycle.</p>
+        </div>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Cycle</th>
+                    <th>Opening Balance</th>
+                    <th>Principal Due</th>
+                    <th>Interest Due</th>
+                    <th>Paid</th>
+                    <th>Closing Balance</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var i in Model.Installments.OrderBy(i => i.InstallmentNumber))
+                {
+                    <tr>
+                        <td>@i.MonthlyCycle.Month.ToString("D2")/@i.MonthlyCycle.Year</td>
+                        <td>₹@i.OpeningPrincipal.ToString("N0")</td>
+                        <td>₹@i.PrincipalAmount.ToString("N0")</td>
+                        <td>₹@i.InterestAmount.ToString("N0")</td>
+                        <td>₹@i.PaidAmount.ToString("N0")</td>
+                        <td>₹@i.ClosingPrincipal.ToString("N0")</td>
+                        <td><span class="badge @(i.Status == "Paid" ? "bg-success" : i.Status == "PartiallyPaid" ? "bg-warning" : "bg-secondary")">@i.Status</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

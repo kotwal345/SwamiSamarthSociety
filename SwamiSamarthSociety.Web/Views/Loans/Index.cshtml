@@ -1,0 +1,93 @@
+@model List<SwamiSamarthSociety.Data.Entities.Loan>
+@{
+    ViewData["Title"] = "Loans";
+    var activeCount = Model.Count(l => l.Status == "Active");
+    var completedCount = Model.Count(l => l.Status == "Completed");
+    var totalOutstanding = Model.Sum(l => l.OutstandingPrincipal);
+}
+
+<div class="page-header">
+    <div>
+        <span class="page-eyebrow">कर्ज</span>
+        <h1>Loans</h1>
+        <p class="page-subtitle">All loans issued to society members.</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">+ New Loan</a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success mb-3">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger mb-3">@TempData["Error"]</div>
+}
+
+<div class="stat-row">
+    <div class="stat-tile accent-primary">
+        <div class="stat-value">@activeCount</div>
+        <div class="stat-label">Active Loans</div>
+    </div>
+    <div class="stat-tile accent-success">
+        <div class="stat-value">@completedCount</div>
+        <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-tile accent-muted">
+        <div class="stat-value">₹@totalOutstanding.ToString("N0")</div>
+        <div class="stat-label">Total Outstanding</div>
+    </div>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="panel">
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
+            <h3>No loans yet</h3>
+            <p>Create the first loan for a society member.</p>
+            <a asp-action="Create" class="btn btn-primary mt-2">+ New Loan</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="table-panel">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Member</th>
+                    <th>Loan No.</th>
+                    <th>Original Amount</th>
+                    <th>Outstanding</th>
+                    <th>Loan Date</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var l in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="cell-name">
+                                <span class="member-avatar">@l.Member.FullName.Substring(0, 1).ToUpper()</span>
+                                <span class="cell-name-text">@l.Member.FullName</span>
+                            </div>
+                        </td>
+                        <td><code class="member-code">@l.LoanNumber</code></td>
+                        <td>₹@l.OriginalLoanAmount.ToString("N0")</td>
+                        <td>₹@l.OutstandingPrincipal.ToString("N0")</td>
+                        <td>@l.LoanDate.ToString("dd-MMM-yyyy")</td>
+                        <td>
+                            <span class="badge @(l.Status == "Active" ? "bg-success" : l.Status == "Completed" ? "bg-secondary" : "bg-warning")">@l.Status</span>
+                        </td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="@l.LoanId" class="btn btn-sm btn-outline-primary">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
