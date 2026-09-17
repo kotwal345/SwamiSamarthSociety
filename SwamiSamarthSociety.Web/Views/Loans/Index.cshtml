@@ -4,15 +4,26 @@
     var activeCount = Model.Count(l => l.Status == "Active");
     var completedCount = Model.Count(l => l.Status == "Completed");
     var totalOutstanding = Model.Sum(l => l.OutstandingPrincipal);
+    string? statusFilter = ViewBag.StatusFilter as string;
 }
 
 <div class="page-header">
     <div>
         <span class="page-eyebrow">कर्ज</span>
         <h1>Loans</h1>
-        <p class="page-subtitle">All loans issued to society members.</p>
+        @if (!string.IsNullOrEmpty(statusFilter))
+        {
+            <p class="page-subtitle">Showing <strong>@statusFilter</strong> loans only. <a asp-action="Index">Clear filter</a></p>
+        }
+        else
+        {
+            <p class="page-subtitle">All loans issued to society members.</p>
+        }
     </div>
-    <a asp-action="Create" class="btn btn-primary">+ New Loan</a>
+    @if (User.IsInRole(AppRoles.Chairman))
+    {
+        <a asp-action="Create" class="btn btn-primary">+ New Loan</a>
+    }
 </div>
 
 @if (TempData["Success"] != null)
@@ -46,13 +57,17 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
             <h3>No loans yet</h3>
             <p>Create the first loan for a society member.</p>
-            <a asp-action="Create" class="btn btn-primary mt-2">+ New Loan</a>
+            @if (User.IsInRole(AppRoles.Chairman))
+            {
+                <a asp-action="Create" class="btn btn-primary mt-2">+ New Loan</a>
+            }
         </div>
     </div>
 }
 else
 {
     <div class="table-panel">
+        <div class="table-responsive">
         <table class="table">
             <thead>
                 <tr>
@@ -89,5 +104,6 @@ else
                 }
             </tbody>
         </table>
+        </div>
     </div>
 }

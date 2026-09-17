@@ -13,7 +13,7 @@ namespace SwamiSamarthSociety.Web.Models
         public decimal TotalShareCollected { get; set; }
         public decimal TotalPrincipalCollected { get; set; }
         public decimal TotalInterestCollected { get; set; }
-        public decimal TotalCollectedAllTime => TotalShareCollected + TotalPrincipalCollected + TotalInterestCollected;
+        public decimal TotalCollectedAllTime => TotalShareCollected + TotalInterestCollected;
 
         public int MonthsTracked { get; set; }
         public int? FirstCycleMonth { get; set; }

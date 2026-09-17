@@ -47,8 +47,11 @@ namespace SwamiSamarthSociety.Services
                     $"An open cycle already exists ({existingOpen.Month:D2}/{existingOpen.Year}). Close it before opening a new one.");
 
             var (year, month) = await GetNextCyclePeriodAsync();
-            var startDate = new DateTime(year, month, 1);
-            var endDate = startDate.AddMonths(1).AddDays(-1);
+            // The society collects shares and loan installments on the 20th of every month, not the calendar
+            // month boundary -- EndDate (the 20th of this cycle's own month) is what LoanInstallment.DueDate
+            // and every payment date get stamped with, so it must be the actual billing day.
+            var endDate = new DateTime(year, month, 20);
+            var startDate = endDate.AddMonths(-1);
 
             var activeMembers = await _db.Members.Where(m => m.Status == "Active").ToListAsync();
             var expectedShare = activeMembers.Sum(m => m.MonthlyShareAmount);
@@ -90,7 +93,7 @@ namespace SwamiSamarthSociety.Services
             foreach (var loan in activeLoans)
             {
                 var principal = _installmentCalculationService.CalculateMonthlyPrincipalInstallment(
-                    loan.OriginalLoanAmount, loan.OutstandingPrincipal, rules);
+                    loan.OriginalLoanAmount, loan.OutstandingPrincipal, loan.InstallmentAmount, rules);
                 var interest = _interestCalculationService.CalculateMonthlyInterest(loan.OutstandingPrincipal, loan.InterestRate);
                 var installmentNumber = await _db.LoanInstallments.CountAsync(i => i.LoanId == loan.LoanId) + 1;
 
@@ -133,26 +136,49 @@ namespace SwamiSamarthSociety.Services
 
         public async Task<List<MonthlyCycleRow>> GetCollectionSheetRowsAsync(int cycleId)
         {
+            var cycle = await _db.MonthlyCycles.FindAsync(cycleId);
+            if (cycle is null) throw new InvalidOperationException("Cycle not found.");
+
             var activeMembers = await _db.Members.Where(m => m.Status == "Active").OrderBy(m => m.MemberCode).ToListAsync();
             var sharePayments = await _db.MemberSharePayments.Where(p => p.MonthlyCycleId == cycleId).ToListAsync();
-            var activeLoans = await _db.Loans.Where(l => l.Status == "Active").ToListAsync();
-            var installments = await _db.LoanInstallments.Where(i => i.MonthlyCycleId == cycleId).ToListAsync();
+            var installments = await _db.LoanInstallments
+                .Include(i => i.Loan)
+                .Where(i => i.MonthlyCycleId == cycleId)
+                .ToListAsync();
+
+            // Cumulative share total per member across every cycle up to and including this one.
+            var cumulativeShares = await _db.MemberSharePayments
+                .Where(p => p.MonthlyCycle.Year < cycle.Year
+                    || (p.MonthlyCycle.Year == cycle.Year && p.MonthlyCycle.Month <= cycle.Month))
+                .GroupBy(p => p.MemberId)
+                .Select(g => new { MemberId = g.Key, Total = g.Sum(p => p.ExpectedAmount) })
+                .ToDictionaryAsync(x => x.MemberId, x => x.Total);
 
             var rows = new List<MonthlyCycleRow>();
             foreach (var member in activeMembers)
             {
                 var sharePayment = sharePayments.FirstOrDefault(p => p.MemberId == member.MemberId);
-                var loan = activeLoans.FirstOrDefault(l => l.MemberId == member.MemberId);
-                var installment = loan is not null ? installments.FirstOrDefault(i => i.LoanId == loan.LoanId) : null;
+                // A member can have two installments in the same cycle if an old loan is paid off
+                // and a new one is disbursed the same month; show the newer loan's installment,
+                // matching what the club's paper register shows for that row.
+                var installment = installments
+                    .Where(i => i.Loan.MemberId == member.MemberId)
+                    .OrderByDescending(i => i.Loan.LoanDate)
+                    .FirstOrDefault();
+                var loan = installment?.Loan;
 
                 rows.Add(new MonthlyCycleRow
                 {
                     MemberId = member.MemberId,
                     MemberCode = member.MemberCode,
                     FullName = member.FullName,
+                    FullNameMarathi = member.FullNameMarathi,
                     ShareExpected = sharePayment?.ExpectedAmount ?? member.MonthlyShareAmount,
                     SharePaid = sharePayment?.PaidAmount ?? 0,
                     ShareStatus = sharePayment?.Status ?? "Pending",
+                    TotalShare = cumulativeShares.TryGetValue(member.MemberId, out var total)
+                        ? total
+                        : sharePayment?.ExpectedAmount ?? member.MonthlyShareAmount,
                     HasActiveLoan = loan is not null,
                     LoanId = loan?.LoanId,
                     LoanNumber = loan?.LoanNumber,

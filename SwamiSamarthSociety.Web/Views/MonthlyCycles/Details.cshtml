@@ -3,7 +3,18 @@
     ViewData["Title"] = "Collection Sheet";
     var cycle = Model.Cycle;
     bool isOpen = cycle.Status == "Open";
+    bool canEdit = isOpen && User.IsInRole(AppRoles.Chairman);
     string[] monthNames = { "", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+
+    var totalShareDue = Model.Rows.Sum(r => r.ShareExpected);
+    var totalSharePaid = Model.Rows.Sum(r => r.SharePaid);
+    var totalOpening = Model.Rows.Sum(r => r.OpeningPrincipal ?? 0m);
+    var totalPrincipalDue = Model.Rows.Sum(r => r.PrincipalDue ?? 0m);
+    var totalInterestDue = Model.Rows.Sum(r => r.InterestDue ?? 0m);
+    var totalLoanPaid = Model.Rows.Sum(r => r.LoanPaidAmount ?? 0m);
+    var totalPaid = Model.Rows.Sum(r => r.TotalPaid);
+    var totalRemaining = Model.Rows.Sum(r => r.RemainingBalance ?? 0m);
+    var totalCollection = cycle.CollectedShareAmount + cycle.TotalPrincipalCollected + cycle.TotalInterestCollected + cycle.OpeningBankBalance;
 }
 
 <div class="page-header">
@@ -15,7 +26,11 @@
             &nbsp;Collection sheet for this cycle.
         </p>
     </div>
-    <a asp-action="Index" class="btn btn-outline-secondary">All Cycles</a>
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-action="ExportExcel" asp-route-id="@cycle.MonthlyCycleId" class="btn btn-outline-primary">Export Excel</a>
+        <a asp-action="ExportPdf" asp-route-id="@cycle.MonthlyCycleId" class="btn btn-outline-primary">Export PDF</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">All Cycles</a>
+    </div>
 </div>
 
 @if (TempData["Success"] != null)
@@ -44,9 +59,18 @@
         <div class="stat-value">₹@cycle.TotalPrincipalCollected.ToString("N0") + ₹@cycle.TotalInterestCollected.ToString("N0")</div>
         <div class="stat-label">Principal + Interest Collected</div>
     </div>
+    <div class="stat-tile accent-primary">
+        <div class="stat-value">₹@totalCollection.ToString("N0")</div>
+        <div class="stat-label">Total Collection (Share + Principal + Interest + Opening Balance)</div>
+    </div>
+    <div class="stat-tile accent-muted">
+        <div class="stat-value">₹@((isOpen ? cycle.OpeningBankBalance : cycle.ClosingBankBalance ?? cycle.OpeningBankBalance).ToString("N0"))</div>
+        <div class="stat-label">@(isOpen ? "Opening Bank Balance" : "Closing Bank Balance")</div>
+    </div>
 </div>
 
-<div class="table-panel" style="overflow-x: auto;">
+<div class="table-panel">
+    <div class="table-responsive">
     <table class="table">
         <thead>
             <tr>
@@ -57,8 +81,9 @@
                 <th>Principal Due</th>
                 <th>Interest Due</th>
                 <th>Loan Paid</th>
+                <th>Total Paid</th>
                 <th>Remaining</th>
-                @if (isOpen)
+                @if (canEdit)
                 {
                     <th></th>
                 }
@@ -67,8 +92,16 @@
         <tbody>
             @foreach (var row in Model.Rows)
             {
+                var formId = $"collect-{row.MemberId}";
                 <tr>
                     <td>
+                        @if (canEdit)
+                        {
+                            <form id="@formId" asp-action="Collect" method="post"></form>
+                            <input type="hidden" form="@formId" name="cycleId" value="@cycle.MonthlyCycleId" />
+                            <input type="hidden" form="@formId" name="memberId" value="@row.MemberId" />
+                            <input type="hidden" form="@formId" name="paymentDate" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                        }
                         <div class="cell-name">
                             <span class="member-avatar">@row.FullName.Substring(0, 1).ToUpper()</span>
                             <div>
@@ -79,29 +112,26 @@
                     </td>
                     <td>₹@row.ShareExpected.ToString("N0")</td>
 
-                    @if (isOpen)
+                    @if (canEdit)
                     {
-                        <td colspan="7">
-                            <form asp-action="Collect" method="post" class="table-inline-form">
-                                <input type="hidden" name="cycleId" value="@cycle.MonthlyCycleId" />
-                                <input type="hidden" name="memberId" value="@row.MemberId" />
-                                <input type="hidden" name="paymentDate" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
-                                <input class="form-control form-control-sm" type="number" step="0.01" name="shareAmountPaid" value="@row.SharePaid" title="Share paid" />
-                                @if (row.HasActiveLoan)
-                                {
-                                    <span class="cell-name-sub">Bal ₹@row.OpeningPrincipal?.ToString("N0")</span>
-                                    <span class="cell-name-sub">P ₹@row.PrincipalDue?.ToString("N0")</span>
-                                    <span class="cell-name-sub">I ₹@row.InterestDue?.ToString("N0")</span>
-                                    <input class="form-control form-control-sm" type="number" step="0.01" name="loanAmountPaid" value="@row.LoanPaidAmount" title="Loan installment paid" />
-                                    <span class="cell-name-sub">Rem ₹@row.RemainingBalance?.ToString("N0")</span>
-                                }
-                                else
-                                {
-                                    <span class="cell-name-sub">No active loan</span>
-                                }
-                                <button type="submit" class="btn btn-sm btn-primary">Save</button>
-                            </form>
+                        <td><input form="@formId" class="form-control form-control-sm" type="number" step="0.01" name="shareAmountPaid" value="@(row.SharePaid > 0 ? row.SharePaid : row.ShareExpected)" title="Share paid" /></td>
+                        <td>@(row.HasActiveLoan ? $"₹{row.OpeningPrincipal:N0}" : "—")</td>
+                        <td>@(row.HasActiveLoan ? $"₹{row.PrincipalDue:N0}" : "—")</td>
+                        <td>@(row.HasActiveLoan ? $"₹{row.InterestDue:N0}" : "—")</td>
+                        <td>
+                            @if (row.HasActiveLoan)
+                            {
+                                var loanDefault = row.LoanPaidAmount > 0 ? row.LoanPaidAmount : (row.PrincipalDue ?? 0) + (row.InterestDue ?? 0);
+                                <input form="@formId" class="form-control form-control-sm" type="number" step="0.01" name="loanAmountPaid" value="@loanDefault" title="Loan installment paid" />
+                            }
+                            else
+                            {
+                                <span class="cell-name-sub">No active loan</span>
+                            }
                         </td>
+                        <td>₹@row.TotalPaid.ToString("N0")</td>
+                        <td>@(row.HasActiveLoan ? $"₹{row.RemainingBalance:N0}" : "—")</td>
+                        <td class="text-end"><button type="submit" form="@formId" class="btn btn-sm btn-primary">Save</button></td>
                     }
                     else
                     {
@@ -110,15 +140,34 @@
                         <td>@(row.HasActiveLoan ? $"₹{row.PrincipalDue:N0}" : "—")</td>
                         <td>@(row.HasActiveLoan ? $"₹{row.InterestDue:N0}" : "—")</td>
                         <td class="row-paid-value">@(row.HasActiveLoan ? $"₹{row.LoanPaidAmount:N0}" : "—")</td>
+                        <td class="row-paid-value">₹@row.TotalPaid.ToString("N0")</td>
                         <td>@(row.HasActiveLoan ? $"₹{row.RemainingBalance:N0}" : "—")</td>
                     }
                 </tr>
             }
         </tbody>
+        <tfoot>
+            <tr class="table-total-row">
+                <td>Total</td>
+                <td>₹@totalShareDue.ToString("N0")</td>
+                <td>₹@totalSharePaid.ToString("N0")</td>
+                <td>₹@totalOpening.ToString("N0")</td>
+                <td>₹@totalPrincipalDue.ToString("N0")</td>
+                <td>₹@totalInterestDue.ToString("N0")</td>
+                <td>₹@totalLoanPaid.ToString("N0")</td>
+                <td>₹@totalPaid.ToString("N0")</td>
+                <td>₹@totalRemaining.ToString("N0")</td>
+                @if (canEdit)
+                {
+                    <td></td>
+                }
+            </tr>
+        </tfoot>
     </table>
+    </div>
 </div>
 
-@if (isOpen)
+@if (canEdit)
 {
     <div class="panel mt-3" style="max-width: 480px;">
         <div class="form-panel-header">

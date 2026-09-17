@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using SwamiSamarthSociety.Web;
 
 namespace SwamiSamarthSociety.Web.Areas.Identity.Pages.Account
 {
@@ -74,6 +75,10 @@ namespace SwamiSamarthSociety.Web.Areas.Identity.Pages.Account
 
             if (result.Succeeded)
             {
+                // The first-ever account becomes Chairman (full access); everyone who signs up
+                // afterwards is a read-only Member by default.
+                await _userManager.AddToRoleAsync(user, IsFirstRun ? AppRoles.Chairman : AppRoles.Member);
+
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 return LocalRedirect(returnUrl);
             }

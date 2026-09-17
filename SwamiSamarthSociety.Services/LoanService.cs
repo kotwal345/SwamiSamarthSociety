@@ -104,7 +104,7 @@ namespace SwamiSamarthSociety.Services
             loan.Status = "Active";
 
             loan.InstallmentAmount = _installmentCalculationService.CalculateMonthlyPrincipalInstallment(
-                loan.OriginalLoanAmount, loan.OriginalLoanAmount, rules);
+                loan.OriginalLoanAmount, loan.OriginalLoanAmount, null, rules);
 
             loan.Guarantors = guarantorMemberIds.Distinct()
                 .Select(id => new LoanGuarantor { GuarantorMemberId = id, Status = "Active" })

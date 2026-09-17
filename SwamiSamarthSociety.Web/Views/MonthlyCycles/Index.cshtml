@@ -11,7 +11,7 @@
         <h1>Monthly Collection</h1>
         <p class="page-subtitle">Open a month to start collecting shares and loan installments.</p>
     </div>
-    @if (!hasOpenCycle)
+    @if (!hasOpenCycle && User.IsInRole(AppRoles.Chairman))
     {
         <a asp-action="OpenNextCycle" class="btn btn-primary">+ Open Next Cycle</a>
     }
@@ -33,13 +33,17 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
             <h3>No cycles yet</h3>
             <p>Open the first monthly cycle to begin collecting shares and installments.</p>
-            <a asp-action="OpenNextCycle" class="btn btn-primary mt-2">+ Open Next Cycle</a>
+            @if (User.IsInRole(AppRoles.Chairman))
+            {
+                <a asp-action="OpenNextCycle" class="btn btn-primary mt-2">+ Open Next Cycle</a>
+            }
         </div>
     </div>
 }
 else
 {
     <div class="table-panel">
+        <div class="table-responsive">
         <table class="table">
             <thead>
                 <tr>
@@ -60,10 +64,15 @@ else
                         <td>₹@c.ExpectedShareAmount.ToString("N0")</td>
                         <td>₹@c.CollectedShareAmount.ToString("N0")</td>
                         <td>₹@c.PendingShareAmount.ToString("N0")</td>
-                        <td class="text-end"><a asp-action="Details" asp-route-id="@c.MonthlyCycleId" class="btn btn-sm btn-outline-primary">Open</a></td>
+                        <td class="text-end">
+                            <a asp-action="ExportExcel" asp-route-id="@c.MonthlyCycleId" class="btn btn-sm btn-outline-secondary">Excel</a>
+                            <a asp-action="ExportPdf" asp-route-id="@c.MonthlyCycleId" class="btn btn-sm btn-outline-secondary">PDF</a>
+                            <a asp-action="Details" asp-route-id="@c.MonthlyCycleId" class="btn btn-sm btn-outline-primary">Open</a>
+                        </td>
                     </tr>
                 }
             </tbody>
         </table>
+        </div>
     </div>
 }

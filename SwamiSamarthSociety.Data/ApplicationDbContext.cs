@@ -24,6 +24,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<MemberExitSettlement> MemberExitSettlements => Set<MemberExitSettlement>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<ImportLog> ImportLogs => Set<ImportLog>();
+    public DbSet<SmsLog> SmsLogs => Set<SmsLog>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -47,6 +48,8 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
         b.Entity<MemberExitSettlement>().ToTable("MemberExitSettlement");
         b.Entity<AuditLog>().ToTable("AuditLog");
         b.Entity<ImportLog>().ToTable("ImportLog");
+        b.Entity<SmsLog>().ToTable("SmsLog");
+        b.Entity<SmsLog>().HasOne(s => s.Member).WithMany().HasForeignKey(s => s.MemberId).OnDelete(DeleteBehavior.Restrict);
 
         b.Entity<Member>().HasIndex(m => m.MemberCode).IsUnique();
         b.Entity<MonthlyCycle>().HasIndex(c => new { c.Year, c.Month }).IsUnique();

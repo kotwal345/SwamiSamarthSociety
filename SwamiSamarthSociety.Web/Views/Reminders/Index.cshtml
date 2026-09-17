@@ -1,0 +1,83 @@
+@model List<SwamiSamarthSociety.Data.Entities.SmsLog>
+@{
+    ViewData["Title"] = "Payment Reminders";
+    bool isConfigured = ViewBag.IsConfigured;
+    int membersWithoutMobile = ViewBag.MembersWithoutMobile;
+}
+
+<div class="page-header">
+    <div>
+        <span class="page-eyebrow">एसएमएस स्मरणपत्र</span>
+        <h1>Payment Reminders</h1>
+        <p class="page-subtitle">Automatically reminds every active member on the 18th, 19th and 20th morning of each month to deposit their loan installment (or share amount if they have no loan).</p>
+    </div>
+    <form asp-action="SendNow" method="post">
+        <button type="submit" class="btn btn-primary">Send Reminders Now</button>
+    </form>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success mb-3">@TempData["Success"]</div>
+}
+
+@if (!isConfigured)
+{
+    <div class="alert alert-danger mb-3">
+        <strong>SMS sending isn't configured yet.</strong> Add <code>Msg91:AuthKey</code> and <code>Msg91:TemplateId</code>
+        to appsettings.json (see the comment at the top of <code>Msg91SmsSender.cs</code> for what's needed on the
+        MSG91 side &mdash; a DLT-approved template whose entire content is a single variable). Until then, every reminder
+        attempt will be logged below as a failure with an explanation, but nothing will actually be sent.
+    </div>
+}
+
+@if (membersWithoutMobile > 0)
+{
+    <div class="alert alert-danger mb-3">
+        <strong>@membersWithoutMobile active member(s) have no mobile number on file</strong> and will be skipped.
+        Add their numbers from <a asp-controller="Members" asp-action="Index">Members</a> &rarr; Edit.
+    </div>
+}
+
+<div class="panel">
+    <div class="form-panel-header">
+        <h1>Recent SMS Log</h1>
+        <p>Most recent 100 reminder attempts, newest first.</p>
+    </div>
+    @if (Model.Count == 0)
+    {
+        <div class="empty-state">
+            <p>No reminders have been sent yet.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sent</th>
+                    <th>Member</th>
+                    <th>Mobile</th>
+                    <th>Type</th>
+                    <th>Message</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var log in Model)
+                {
+                    <tr>
+                        <td>@log.SentDate.ToLocalTime().ToString("dd-MMM-yyyy HH:mm")</td>
+                        <td>@log.Member.FullName</td>
+                        <td>@log.PhoneNumber</td>
+                        <td>@log.ReminderType</td>
+                        <td style="max-width:320px;">@log.Message</td>
+                        <td><span class="badge @(log.Success ? "bg-success" : "bg-warning")">@(log.Success ? "Sent" : "Failed")</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        </div>
+    }
+</div>

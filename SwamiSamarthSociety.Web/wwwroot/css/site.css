@@ -142,7 +142,7 @@ a {
 }
 
 .site-navbar .navbar-toggler-icon {
-  filter: invert(1);
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
 /* Account chip + auth CTAs in the navbar */
@@ -327,11 +327,26 @@ a {
 }
 
 .stat-tile {
+  display: block;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 1rem 1.15rem;
   box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
+}
+
+a.stat-tile {
+  cursor: pointer;
+}
+
+a.stat-tile:hover, a.stat-tile:focus {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+  color: inherit;
 }
 
 .stat-tile .stat-value {
@@ -395,6 +410,12 @@ a {
 
 .table-panel .table tbody tr:hover {
   background: #f9fafd;
+}
+
+.table-total-row td {
+  font-weight: 700;
+  background: #f0f4ea;
+  border-top: 2px solid var(--border-strong);
 }
 
 .member-avatar {
@@ -648,22 +669,11 @@ code.member-code {
 /* ---------------------------------------------------------
    Inline row-editing (collection sheet)
    --------------------------------------------------------- */
-.table-inline-form {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
-}
-
-.table-inline-form input.form-control-sm {
+.table-panel input.form-control-sm {
   width: 90px;
   padding: 0.3rem 0.5rem;
   font-size: 0.84rem;
   border-radius: 6px;
-}
-
-.table-inline-form .btn-sm {
-  white-space: nowrap;
 }
 
 .row-paid-value {
@@ -684,11 +694,6 @@ code.member-code {
 
 .row-edit-toggle:hover {
   text-decoration: underline;
-}
-
-.collection-row-static {
-  display: flex;
-  align-items: center;
 }
 
 /* ---------------------------------------------------------
@@ -777,17 +782,17 @@ code.member-code {
 }
 
 .chart-tooltip {
-  position: absolute;
+  position: fixed;
   pointer-events: none;
   opacity: 0;
-  transform: translate(-50%, -100%);
   transition: opacity 0.1s ease;
   background: var(--brand-primary-dark);
   color: #fff;
   padding: 9px 12px;
   border-radius: 9px;
   font-size: 0.78rem;
-  white-space: nowrap;
+  white-space: normal;
+  max-width: min(240px, calc(100vw - 16px));
   box-shadow: var(--shadow-md);
   z-index: 20;
 }
@@ -820,6 +825,17 @@ code.member-code {
   font-weight: 700;
   margin-left: auto;
   padding-left: 10px;
+}
+
+.chart-tooltip .tt-row-total {
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  font-weight: 700;
+}
+
+.chart-tooltip .tt-row-total .tt-value {
+  color: #fff;
 }
 
 /* ---------------------------------------------------------

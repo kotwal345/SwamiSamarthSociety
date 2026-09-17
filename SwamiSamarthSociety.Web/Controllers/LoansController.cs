@@ -12,9 +12,12 @@ namespace SwamiSamarthSociety.Web.Controllers
         private readonly ILoanService _loanService;
         public LoansController(ILoanService loanService) => _loanService = loanService;
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? status = null)
         {
             var loans = await _loanService.GetAllAsync();
+            if (!string.IsNullOrEmpty(status))
+                loans = loans.Where(l => l.Status == status).ToList();
+            ViewBag.StatusFilter = status;
             return View(loans);
         }
 
@@ -25,6 +28,7 @@ namespace SwamiSamarthSociety.Web.Controllers
             return View(loan);
         }
 
+        [Authorize(Roles = AppRoles.Chairman)]
         public async Task<IActionResult> Create()
         {
             var vm = new LoanCreateViewModel
@@ -38,6 +42,7 @@ namespace SwamiSamarthSociety.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = AppRoles.Chairman)]
         public async Task<IActionResult> Create(LoanCreateViewModel vm)
         {
             var errors = ModelState.IsValid

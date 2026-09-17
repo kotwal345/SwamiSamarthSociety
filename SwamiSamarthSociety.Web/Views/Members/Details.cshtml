@@ -10,7 +10,10 @@
         <p class="page-subtitle">Full details for this society member.</p>
     </div>
     <div>
-        <a asp-action="Edit" asp-route-id="@Model.MemberId" class="btn btn-outline-secondary">Edit Member</a>
+        @if (User.IsInRole(AppRoles.Chairman))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.MemberId" class="btn btn-outline-secondary">Edit Member</a>
+        }
         <a asp-action="Index" class="btn btn-outline-secondary">Back to list</a>
     </div>
 </div>

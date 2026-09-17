@@ -7,10 +7,14 @@ namespace SwamiSamarthSociety.Services
         public int MemberId { get; set; }
         public string MemberCode { get; set; } = null!;
         public string FullName { get; set; } = null!;
+        public string? FullNameMarathi { get; set; }
 
         public decimal ShareExpected { get; set; }
         public decimal SharePaid { get; set; }
         public string ShareStatus { get; set; } = "Pending";
+
+        // Cumulative sum of this member's share amount across every cycle up to and including this one.
+        public decimal TotalShare { get; set; }
 
         public bool HasActiveLoan { get; set; }
         public int? LoanId { get; set; }
@@ -21,5 +25,11 @@ namespace SwamiSamarthSociety.Services
         public decimal? LoanPaidAmount { get; set; }
         public string? LoanStatus { get; set; }
         public decimal? RemainingBalance { get; set; }
+
+        // Share + principal + interest due this cycle, matching the club's monthly "एकूण रक्कम" column.
+        public decimal TotalAmount => ShareExpected + (PrincipalDue ?? 0) + (InterestDue ?? 0);
+
+        // Share + loan amount actually collected this cycle -- what the member has physically paid so far.
+        public decimal TotalPaid => SharePaid + (LoanPaidAmount ?? 0);
     }
 }

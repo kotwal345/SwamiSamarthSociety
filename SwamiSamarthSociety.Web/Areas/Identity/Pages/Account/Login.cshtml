@@ -78,8 +78,12 @@
             <button type="submit" class="auth-submit">Sign in</button>
         </form>
 
+        @* Self-registration is off for now -- the chairman shares logins directly with the 4 accounts already created.
+           Re-enable this once open sign-up is wanted again. *@
+        @*
         <div class="auth-switch">
             New to the society? <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Create an account</a>
         </div>
+        *@
     </div>
 </div>

@@ -40,6 +40,12 @@
                         <li class="nav-item">
                             <a class="nav-link @(currentController == "MonthlyCycles" ? "active" : "")" asp-area="" asp-controller="MonthlyCycles" asp-action="Index">Collection</a>
                         </li>
+                        @if (User.IsInRole(AppRoles.Chairman))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @(currentController == "Reminders" ? "active" : "")" asp-area="" asp-controller="Reminders" asp-action="Index">Reminders</a>
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>

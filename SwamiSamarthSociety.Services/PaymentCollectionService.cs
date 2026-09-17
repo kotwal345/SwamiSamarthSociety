@@ -77,7 +77,7 @@ namespace SwamiSamarthSociety.Services
                     // Defensive fallback: loan was created after the cycle opened, so no placeholder exists yet.
                     var rules = await _db.LoanInstallmentRules.Where(r => r.IsActive).ToListAsync();
                     var principalDue = _installmentCalculationService.CalculateMonthlyPrincipalInstallment(
-                        loan.OriginalLoanAmount, loan.OutstandingPrincipal, rules);
+                        loan.OriginalLoanAmount, loan.OutstandingPrincipal, loan.InstallmentAmount, rules);
                     var interestDue = _interestCalculationService.CalculateMonthlyInterest(loan.OutstandingPrincipal, loan.InterestRate);
                     var installmentNumber = await _db.LoanInstallments.CountAsync(i => i.LoanId == loan.LoanId) + 1;
 

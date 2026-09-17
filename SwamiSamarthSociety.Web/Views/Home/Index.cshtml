@@ -61,45 +61,48 @@
         <h1>Society Dashboard</h1>
         <p class="page-subtitle">Membership and collection history at a glance.</p>
     </div>
-    <a asp-controller="Members" asp-action="Create" class="btn btn-primary">+ Add Member</a>
+    @if (User.IsInRole(AppRoles.Chairman))
+    {
+        <a asp-controller="Members" asp-action="Create" class="btn btn-primary">+ Add Member</a>
+    }
 </div>
 
 <div class="stat-row">
-    <div class="stat-tile accent-primary">
+    <a asp-controller="MonthlyCycles" asp-action="Index" class="stat-tile accent-primary">
         <div class="stat-value">₹@Model.TotalCollectedAllTime.ToString("N0")</div>
         <div class="stat-label">Total Collected (All-Time)</div>
-    </div>
-    <div class="stat-tile accent-success">
+    </a>
+    <a asp-controller="MonthlyCycles" asp-action="Index" class="stat-tile accent-success">
         <div class="stat-value">₹@Model.TotalInterestCollected.ToString("N0")</div>
         <div class="stat-label">Total Interest Earned</div>
-    </div>
-    <div class="stat-tile accent-accent">
-        <div class="stat-value">₹@Model.TotalPrincipalCollected.ToString("N0")</div>
-        <div class="stat-label">Loan Principal Recovered</div>
-    </div>
-    <div class="stat-tile accent-muted">
+    </a>
+    <a asp-controller="MonthlyCycles" asp-action="Index" class="stat-tile accent-accent">
+        <div class="stat-value">₹@Model.TotalShareCollected.ToString("N0")</div>
+        <div class="stat-label">Total Share Collected (All-Time)</div>
+    </a>
+    <a asp-controller="MonthlyCycles" asp-action="Index" class="stat-tile accent-muted">
         <div class="stat-value">₹@Model.CurrentBankBalance.ToString("N0")</div>
         <div class="stat-label">Current Bank Balance</div>
-    </div>
+    </a>
 </div>
 
 <div class="stat-row">
-    <div class="stat-tile accent-primary">
+    <a asp-controller="Members" asp-action="Index" class="stat-tile accent-primary">
         <div class="stat-value">@Model.TotalMembers</div>
         <div class="stat-label">Total Members</div>
-    </div>
-    <div class="stat-tile accent-success">
+    </a>
+    <a asp-controller="Members" asp-action="Index" asp-route-status="Active" class="stat-tile accent-success">
         <div class="stat-value">@Model.ActiveMembers</div>
         <div class="stat-label">Active Members</div>
-    </div>
-    <div class="stat-tile accent-accent">
+    </a>
+    <a asp-controller="Loans" asp-action="Index" asp-route-status="Active" class="stat-tile accent-accent">
         <div class="stat-value">@Model.ActiveLoansCount</div>
         <div class="stat-label">Active Loans · ₹@Model.TotalOutstandingPrincipal.ToString("N0") outstanding</div>
-    </div>
-    <div class="stat-tile accent-muted">
+    </a>
+    <a asp-controller="MonthlyCycles" asp-action="Index" class="stat-tile accent-muted">
         <div class="stat-value">@Model.MonthsTracked mo</div>
         <div class="stat-label">Tracked Since @SinceLabel() (@RunningLabel())</div>
-    </div>
+    </a>
 </div>
 
 <div class="panel mb-3">
@@ -127,7 +130,7 @@
     else
     {
         <div class="chart-wrap" id="historyChartWrap" style="overflow-x: auto;">
-            <svg class="history-chart" viewBox="0 0 @(svgWidth.ToString(System.Globalization.CultureInfo.InvariantCulture)) @(svgHeight.ToString(System.Globalization.CultureInfo.InvariantCulture))" role="img" aria-label="Monthly collections chart">
+            <svg class="history-chart" style="min-width: @(svgWidth.ToString(System.Globalization.CultureInfo.InvariantCulture))px;" viewBox="0 0 @(svgWidth.ToString(System.Globalization.CultureInfo.InvariantCulture)) @(svgHeight.ToString(System.Globalization.CultureInfo.InvariantCulture))" role="img" aria-label="Monthly collections chart">
                 @{
                     var tickCount = 4;
                 }
@@ -161,25 +164,25 @@
                         var lastSegment = principalH <= 0 && interestH <= 0;
                         <path class="bar-segment" fill="#2c4a9e" tabindex="0"
                               d="@(lastSegment ? RoundedTopRectPath(bx, shareY, barWidth, shareH, 4) : FormattableString.Invariant($"M{bx},{shareY + shareH} L{bx},{shareY} L{bx + barWidth},{shareY} L{bx + barWidth},{shareY + shareH} Z"))"
-                              data-month="@monthLabelFull" data-series="Share" data-value="@point.ShareCollected.ToString("N0")" data-color="#2c4a9e"></path>
+                              data-month="@monthLabelFull" data-series="Share" data-value="@point.ShareCollected.ToString("N0")" data-color="#2c4a9e" data-total="@point.Total.ToString("N0")"></path>
                     }
                     if (principalH > 0)
                     {
                         var lastSegment = interestH <= 0;
                         <path class="bar-segment" fill="#e08a2c" tabindex="0"
                               d="@(lastSegment ? RoundedTopRectPath(bx, principalY, barWidth, principalH, 4) : FormattableString.Invariant($"M{bx},{principalY + principalH} L{bx},{principalY} L{bx + barWidth},{principalY} L{bx + barWidth},{principalY + principalH} Z"))"
-                              data-month="@monthLabelFull" data-series="Loan Principal" data-value="@point.PrincipalCollected.ToString("N0")" data-color="#e08a2c"></path>
+                              data-month="@monthLabelFull" data-series="Loan Principal" data-value="@point.PrincipalCollected.ToString("N0")" data-color="#e08a2c" data-total="@point.Total.ToString("N0")"></path>
                     }
                     if (interestH > 0)
                     {
                         <path class="bar-segment" fill="#1f8a3d" tabindex="0"
                               d="@RoundedTopRectPath(bx, interestY, barWidth, interestH, 4)"
-                              data-month="@monthLabelFull" data-series="Interest" data-value="@point.InterestCollected.ToString("N0")" data-color="#1f8a3d"></path>
+                              data-month="@monthLabelFull" data-series="Interest" data-value="@point.InterestCollected.ToString("N0")" data-color="#1f8a3d" data-total="@point.Total.ToString("N0")"></path>
                     }
                     if (shareH <= 0 && principalH <= 0 && interestH <= 0)
                     {
                         <rect class="bar-segment" x="@bx.ToString(System.Globalization.CultureInfo.InvariantCulture)" y="@((baseline - 2).ToString(System.Globalization.CultureInfo.InvariantCulture))" width="@barWidth.ToString(System.Globalization.CultureInfo.InvariantCulture)" height="2" fill="var(--border-strong)" tabindex="0"
-                              data-month="@monthLabelFull" data-series="No collection" data-value="0" data-color="#c3c2b7"></rect>
+                              data-month="@monthLabelFull" data-series="No collection" data-value="0" data-color="#c3c2b7" data-total="@point.Total.ToString("N0")"></rect>
                     }
                     @Html.Raw(FormattableString.Invariant($"<text class=\"axis-label\" x=\"{bx + barWidth / 2}\" y=\"{topPad + plotHeight + 18}\" text-anchor=\"middle\">{System.Net.WebUtility.HtmlEncode(monthLabel)}</text>"))
                 }
@@ -196,6 +199,7 @@
             <h1>Cycle History</h1>
             <p>Every monthly cycle tracked, oldest first.</p>
         </div>
+        <div class="table-responsive">
         <table class="table">
             <thead>
                 <tr>
@@ -221,6 +225,7 @@
                 }
             </tbody>
         </table>
+        </div>
     </div>
 }
 
@@ -236,11 +241,15 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /></svg>
             <h3>No members yet</h3>
             <p>Add your first society member to get started.</p>
-            <a asp-controller="Members" asp-action="Create" class="btn btn-primary mt-2">+ Add Member</a>
+            @if (User.IsInRole(AppRoles.Chairman))
+            {
+                <a asp-controller="Members" asp-action="Create" class="btn btn-primary mt-2">+ Add Member</a>
+            }
         </div>
     }
     else
     {
+        <div class="table-responsive">
         <table class="table">
             <thead>
                 <tr>
@@ -269,6 +278,7 @@
                 }
             </tbody>
         </table>
+        </div>
     }
 </div>
 
@@ -294,6 +304,7 @@
 
                     // Show every series for this month's bar (same data-month group).
                     var group = wrap.querySelectorAll('.bar-segment[data-month="' + CSS.escape(month) + '"]');
+                    var monthTotal = null;
                     group.forEach(function (seg) {
                         var row = document.createElement('div');
                         row.className = 'tt-row';
@@ -309,16 +320,40 @@
                         row.appendChild(label);
                         row.appendChild(value);
                         tooltip.appendChild(row);
+                        monthTotal = seg.getAttribute('data-total');
                     });
+
+                    if (monthTotal !== null) {
+                        var totalRow = document.createElement('div');
+                        totalRow.className = 'tt-row tt-row-total';
+                        var totalLabel = document.createElement('span');
+                        totalLabel.textContent = 'Total';
+                        var totalValue = document.createElement('span');
+                        totalValue.className = 'tt-value';
+                        totalValue.textContent = '₹' + monthTotal;
+                        totalRow.appendChild(totalLabel);
+                        totalRow.appendChild(totalValue);
+                        tooltip.appendChild(totalRow);
+                    }
                 }
 
-                var wrapRect = wrap.getBoundingClientRect();
-                var targetRect = target.getBoundingClientRect();
-                var x = targetRect.left - wrapRect.left + wrap.scrollLeft + targetRect.width / 2;
-                var y = targetRect.top - wrapRect.top - 10;
-                tooltip.style.left = x + 'px';
-                tooltip.style.top = y + 'px';
                 tooltip.classList.add('visible');
+
+                var margin = 8;
+                var targetRect = target.getBoundingClientRect();
+                var tipRect = tooltip.getBoundingClientRect();
+
+                var left = targetRect.left + targetRect.width / 2 - tipRect.width / 2;
+                left = Math.max(margin, Math.min(left, window.innerWidth - tipRect.width - margin));
+
+                var top = targetRect.top - tipRect.height - 10;
+                if (top < margin) {
+                    top = targetRect.bottom + 10;
+                }
+                top = Math.max(margin, Math.min(top, window.innerHeight - tipRect.height - margin));
+
+                tooltip.style.left = left + 'px';
+                tooltip.style.top = top + 'px';
             }
 
             function hideTooltip() {
