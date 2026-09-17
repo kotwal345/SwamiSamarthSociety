@@ -13,7 +13,7 @@
     </div>
     @if (!hasOpenCycle && User.IsInRole(AppRoles.Chairman))
     {
-        <a asp-action="OpenNextCycle" class="btn btn-primary">+ Open Next Cycle</a>
+        <a asp-action="OpenNextCycle" class="btn btn-primary">@Icons.Render("plus", "icon-sm")Open Next Cycle</a>
     }
 </div>
 
@@ -35,7 +35,7 @@
             <p>Open the first monthly cycle to begin collecting shares and installments.</p>
             @if (User.IsInRole(AppRoles.Chairman))
             {
-                <a asp-action="OpenNextCycle" class="btn btn-primary mt-2">+ Open Next Cycle</a>
+                <a asp-action="OpenNextCycle" class="btn btn-primary mt-2">@Icons.Render("plus", "icon-sm")Open Next Cycle</a>
             }
         </div>
     </div>
@@ -65,9 +65,9 @@ else
                         <td>₹@c.CollectedShareAmount.ToString("N0")</td>
                         <td>₹@c.PendingShareAmount.ToString("N0")</td>
                         <td class="text-end">
-                            <a asp-action="ExportExcel" asp-route-id="@c.MonthlyCycleId" class="btn btn-sm btn-outline-secondary">Excel</a>
-                            <a asp-action="ExportPdf" asp-route-id="@c.MonthlyCycleId" class="btn btn-sm btn-outline-secondary">PDF</a>
-                            <a asp-action="Details" asp-route-id="@c.MonthlyCycleId" class="btn btn-sm btn-outline-primary">Open</a>
+                            <a asp-action="ExportExcel" asp-route-id="@c.MonthlyCycleId" class="btn btn-sm btn-outline-secondary">@Icons.Render("download", "icon-sm")Excel</a>
+                            <a asp-action="ExportPdf" asp-route-id="@c.MonthlyCycleId" class="btn btn-sm btn-outline-secondary">@Icons.Render("file-text", "icon-sm")PDF</a>
+                            <a asp-action="Details" asp-route-id="@c.MonthlyCycleId" class="btn btn-sm btn-outline-primary">Open @Icons.Render("arrow-right", "icon-sm")</a>
                         </td>
                     </tr>
                 }

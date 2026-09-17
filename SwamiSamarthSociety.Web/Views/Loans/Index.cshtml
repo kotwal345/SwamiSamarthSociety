@@ -22,7 +22,7 @@
     </div>
     @if (User.IsInRole(AppRoles.Chairman))
     {
-        <a asp-action="Create" class="btn btn-primary">+ New Loan</a>
+        <a asp-action="Create" class="btn btn-primary">@Icons.Render("plus", "icon-sm")New Loan</a>
     }
 </div>
 
@@ -37,16 +37,25 @@
 
 <div class="stat-row">
     <div class="stat-tile accent-primary">
-        <div class="stat-value">@activeCount</div>
-        <div class="stat-label">Active Loans</div>
+        <span class="stat-icon">@Icons.Render("credit-card")</span>
+        <span class="stat-body">
+            <span class="stat-value">@activeCount</span>
+            <span class="stat-label">Active Loans</span>
+        </span>
     </div>
     <div class="stat-tile accent-success">
-        <div class="stat-value">@completedCount</div>
-        <div class="stat-label">Completed</div>
+        <span class="stat-icon">@Icons.Render("check-circle")</span>
+        <span class="stat-body">
+            <span class="stat-value">@completedCount</span>
+            <span class="stat-label">Completed</span>
+        </span>
     </div>
     <div class="stat-tile accent-muted">
-        <div class="stat-value">₹@totalOutstanding.ToString("N0")</div>
-        <div class="stat-label">Total Outstanding</div>
+        <span class="stat-icon">@Icons.Render("trending-up")</span>
+        <span class="stat-body">
+            <span class="stat-value">₹@totalOutstanding.ToString("N0")</span>
+            <span class="stat-label">Total Outstanding</span>
+        </span>
     </div>
 </div>
 
@@ -59,7 +68,7 @@
             <p>Create the first loan for a society member.</p>
             @if (User.IsInRole(AppRoles.Chairman))
             {
-                <a asp-action="Create" class="btn btn-primary mt-2">+ New Loan</a>
+                <a asp-action="Create" class="btn btn-primary mt-2">@Icons.Render("plus", "icon-sm")New Loan</a>
             }
         </div>
     </div>

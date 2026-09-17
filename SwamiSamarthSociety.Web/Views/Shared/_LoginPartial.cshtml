@@ -2,29 +2,29 @@
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 
-<ul class="navbar-nav align-items-md-center">
+<ul class="topbar-user">
 @if (SignInManager.IsSignedIn(User))
 {
     var initial = (User.Identity?.Name ?? "?").Trim().Substring(0, 1).ToUpper();
-    <li class="nav-item me-2">
+    <li>
         <a class="user-chip" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage your account">
             <span class="user-chip-avatar">@initial</span>
-            <span>@User.Identity?.Name</span>
+            <span class="user-chip-name">@User.Identity?.Name</span>
         </a>
     </li>
-    <li class="nav-item">
-        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button type="submit" class="btn-nav-logout">Logout</button>
+    <li>
+        <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+            <button type="submit" class="btn-nav-logout" title="Logout">@Icons.Render("log-out")<span>Logout</span></button>
         </form>
     </li>
 }
 else
 {
-    <li class="nav-item">
-        <a class="nav-link btn-nav-ghost" asp-area="Identity" asp-page="/Account/Login">Login</a>
+    <li>
+        <a class="btn-nav-ghost" asp-area="Identity" asp-page="/Account/Login">Login</a>
     </li>
-    <li class="nav-item">
-        <a class="nav-link btn-nav-solid" asp-area="Identity" asp-page="/Account/Register">Register</a>
+    <li>
+        <a class="btn-nav-solid" asp-area="Identity" asp-page="/Account/Register">Register</a>
     </li>
 }
 </ul>

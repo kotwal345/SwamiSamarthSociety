@@ -27,8 +27,8 @@
         </p>
     </div>
     <div class="d-flex flex-wrap gap-2">
-        <a asp-action="ExportExcel" asp-route-id="@cycle.MonthlyCycleId" class="btn btn-outline-primary">Export Excel</a>
-        <a asp-action="ExportPdf" asp-route-id="@cycle.MonthlyCycleId" class="btn btn-outline-primary">Export PDF</a>
+        <a asp-action="ExportExcel" asp-route-id="@cycle.MonthlyCycleId" class="btn btn-outline-primary">@Icons.Render("download", "icon-sm")Export Excel</a>
+        <a asp-action="ExportPdf" asp-route-id="@cycle.MonthlyCycleId" class="btn btn-outline-primary">@Icons.Render("file-text", "icon-sm")Export PDF</a>
         <a asp-action="Index" class="btn btn-outline-secondary">All Cycles</a>
     </div>
 </div>
@@ -44,28 +44,46 @@
 
 <div class="stat-row">
     <div class="stat-tile accent-primary">
-        <div class="stat-value">₹@cycle.ExpectedShareAmount.ToString("N0")</div>
-        <div class="stat-label">Expected Share</div>
+        <span class="stat-icon">@Icons.Render("layers")</span>
+        <span class="stat-body">
+            <span class="stat-value">₹@cycle.ExpectedShareAmount.ToString("N0")</span>
+            <span class="stat-label">Expected Share</span>
+        </span>
     </div>
     <div class="stat-tile accent-success">
-        <div class="stat-value">₹@cycle.CollectedShareAmount.ToString("N0")</div>
-        <div class="stat-label">Collected Share</div>
+        <span class="stat-icon">@Icons.Render("check-circle")</span>
+        <span class="stat-body">
+            <span class="stat-value">₹@cycle.CollectedShareAmount.ToString("N0")</span>
+            <span class="stat-label">Collected Share</span>
+        </span>
     </div>
     <div class="stat-tile accent-muted">
-        <div class="stat-value">₹@cycle.PendingShareAmount.ToString("N0")</div>
-        <div class="stat-label">Pending Share</div>
+        <span class="stat-icon">@Icons.Render("clock")</span>
+        <span class="stat-body">
+            <span class="stat-value">₹@cycle.PendingShareAmount.ToString("N0")</span>
+            <span class="stat-label">Pending Share</span>
+        </span>
     </div>
     <div class="stat-tile accent-accent">
-        <div class="stat-value">₹@cycle.TotalPrincipalCollected.ToString("N0") + ₹@cycle.TotalInterestCollected.ToString("N0")</div>
-        <div class="stat-label">Principal + Interest Collected</div>
+        <span class="stat-icon">@Icons.Render("percent")</span>
+        <span class="stat-body">
+            <span class="stat-value">₹@cycle.TotalPrincipalCollected.ToString("N0") + ₹@cycle.TotalInterestCollected.ToString("N0")</span>
+            <span class="stat-label">Principal + Interest Collected</span>
+        </span>
     </div>
     <div class="stat-tile accent-primary">
-        <div class="stat-value">₹@totalCollection.ToString("N0")</div>
-        <div class="stat-label">Total Collection (Share + Principal + Interest + Opening Balance)</div>
+        <span class="stat-icon">@Icons.Render("trending-up")</span>
+        <span class="stat-body">
+            <span class="stat-value">₹@totalCollection.ToString("N0")</span>
+            <span class="stat-label">Total Collection (Share + Principal + Interest + Opening Balance)</span>
+        </span>
     </div>
     <div class="stat-tile accent-muted">
-        <div class="stat-value">₹@((isOpen ? cycle.OpeningBankBalance : cycle.ClosingBankBalance ?? cycle.OpeningBankBalance).ToString("N0"))</div>
-        <div class="stat-label">@(isOpen ? "Opening Bank Balance" : "Closing Bank Balance")</div>
+        <span class="stat-icon">@Icons.Render("credit-card")</span>
+        <span class="stat-body">
+            <span class="stat-value">₹@((isOpen ? cycle.OpeningBankBalance : cycle.ClosingBankBalance ?? cycle.OpeningBankBalance).ToString("N0"))</span>
+            <span class="stat-label">@(isOpen ? "Opening Bank Balance" : "Closing Bank Balance")</span>
+        </span>
     </div>
 </div>
 

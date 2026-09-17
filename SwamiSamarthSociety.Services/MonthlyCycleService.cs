@@ -187,7 +187,14 @@ namespace SwamiSamarthSociety.Services
                     InterestDue = installment?.InterestAmount,
                     LoanPaidAmount = installment?.PaidAmount,
                     LoanStatus = installment?.Status,
-                    RemainingBalance = installment?.ClosingPrincipal ?? loan?.OutstandingPrincipal
+                    // Projected balance for the sheet: opening principal less this cycle's due
+                    // installment, recomputed fresh every time the sheet is built. This is
+                    // deliberately independent of LoanInstallment.ClosingPrincipal, which only
+                    // updates once a payment is actually collected -- the sheet is handed out
+                    // before collection, so it must show what members owe, not what's been paid.
+                    RemainingBalance = loan is null
+                        ? null
+                        : (installment?.OpeningPrincipal ?? loan.OutstandingPrincipal) - (installment?.PrincipalAmount ?? 0)
                 });
             }
             return rows;

@@ -20,7 +20,7 @@
     </div>
     @if (User.IsInRole(AppRoles.Chairman))
     {
-        <a asp-action="Create" class="btn btn-primary">+ Add Member</a>
+        <a asp-action="Create" class="btn btn-primary">@Icons.Render("plus", "icon-sm")Add Member</a>
     }
 </div>
 
@@ -31,16 +31,25 @@
 
 <div class="stat-row">
     <div class="stat-tile accent-primary">
-        <div class="stat-value">@Model.Count</div>
-        <div class="stat-label">Total Members</div>
+        <span class="stat-icon">@Icons.Render("users")</span>
+        <span class="stat-body">
+            <span class="stat-value">@Model.Count</span>
+            <span class="stat-label">Total Members</span>
+        </span>
     </div>
     <div class="stat-tile accent-success">
-        <div class="stat-value">@activeCount</div>
-        <div class="stat-label">Active</div>
+        <span class="stat-icon">@Icons.Render("user-check")</span>
+        <span class="stat-body">
+            <span class="stat-value">@activeCount</span>
+            <span class="stat-label">Active</span>
+        </span>
     </div>
     <div class="stat-tile accent-muted">
-        <div class="stat-value">@(Model.Count - activeCount)</div>
-        <div class="stat-label">Inactive / Left</div>
+        <span class="stat-icon">@Icons.Render("user-x")</span>
+        <span class="stat-body">
+            <span class="stat-value">@(Model.Count - activeCount)</span>
+            <span class="stat-label">Inactive / Left</span>
+        </span>
     </div>
 </div>
 
@@ -53,7 +62,7 @@
             <p>Add your first society member to get started.</p>
             @if (User.IsInRole(AppRoles.Chairman))
             {
-                <a asp-action="Create" class="btn btn-primary mt-2">+ Add Member</a>
+                <a asp-action="Create" class="btn btn-primary mt-2">@Icons.Render("plus", "icon-sm")Add Member</a>
             }
         </div>
     </div>

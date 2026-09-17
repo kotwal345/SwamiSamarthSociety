@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -12,9 +12,10 @@
     @{
         var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     }
-    <header class="site-header">
-        <nav class="navbar navbar-expand-md site-navbar">
-            <div class="container-fluid">
+    <div class="app-shell">
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+        <aside class="sidebar" id="appSidebar">
+            <div class="sidebar-brand">
                 <a class="site-brand" asp-area="" asp-controller="Home" asp-action="Index">
                     <span class="site-brand-mark">S</span>
                     <span class="site-brand-text">
@@ -22,61 +23,62 @@
                         <small>सभासद व्यवस्थापन प्रणाली</small>
                     </span>
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+                <button type="button" class="sidebar-close" id="sidebarClose" aria-label="Close menu">@Icons.Render("x")</button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a class="sidebar-link @(currentController == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">
+                    @Icons.Render("home")<span>Dashboard</span>
+                </a>
+                <a class="sidebar-link @(currentController == "Members" ? "active" : "")" asp-area="" asp-controller="Members" asp-action="Index">
+                    @Icons.Render("users")<span>Members</span>
+                </a>
+                <a class="sidebar-link @(currentController == "Loans" ? "active" : "")" asp-area="" asp-controller="Loans" asp-action="Index">
+                    @Icons.Render("credit-card")<span>Loans</span>
+                </a>
+                <a class="sidebar-link @(currentController == "MonthlyCycles" ? "active" : "")" asp-area="" asp-controller="MonthlyCycles" asp-action="Index">
+                    @Icons.Render("calendar")<span>Collection</span>
+                </a>
+                @if (User.IsInRole(AppRoles.Chairman))
+                {
+                    <a class="sidebar-link @(currentController == "Reminders" ? "active" : "")" asp-area="" asp-controller="Reminders" asp-action="Index">
+                        @Icons.Render("bell")<span>Reminders</span>
+                    </a>
+                }
+                <div class="sidebar-divider"></div>
+                <a class="sidebar-link" asp-area="" asp-controller="Home" asp-action="Privacy">
+                    @Icons.Render("shield")<span>Privacy</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <span>&copy; @DateTime.Now.Year Shri Swami Samarth Sahakari Society</span>
+            </div>
+        </aside>
+
+        <div class="app-content">
+            <header class="topbar">
+                <button type="button" class="topbar-toggle" id="sidebarToggle" aria-label="Open menu" aria-controls="appSidebar" aria-expanded="false">
+                    @Icons.Render("menu")
                 </button>
-                <div class="navbar-collapse collapse d-md-inline-flex justify-content-between">
-                    <ul class="navbar-nav site-nav flex-grow-1 ms-md-4">
-                        <li class="nav-item">
-                            <a class="nav-link @(currentController == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @(currentController == "Members" ? "active" : "")" asp-area="" asp-controller="Members" asp-action="Index">Members</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @(currentController == "Loans" ? "active" : "")" asp-area="" asp-controller="Loans" asp-action="Index">Loans</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @(currentController == "MonthlyCycles" ? "active" : "")" asp-area="" asp-controller="MonthlyCycles" asp-action="Index">Collection</a>
-                        </li>
-                        @if (User.IsInRole(AppRoles.Chairman))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link @(currentController == "Reminders" ? "active" : "")" asp-area="" asp-controller="Reminders" asp-action="Index">Reminders</a>
-                            </li>
-                        }
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                    <partial name="_LoginPartial" />
+                <h2 class="topbar-title">@ViewData["Title"]</h2>
+                <partial name="_LoginPartial" />
+            </header>
+
+            <main role="main" class="page-main">
+                <div class="content-container">
+                    @RenderBody()
                 </div>
-            </div>
-        </nav>
-    </header>
+            </main>
 
-    <main role="main" class="page-main">
-        <div class="container">
-            @RenderBody()
+            <footer class="site-footer">
+                <div class="content-container site-footer-inner">
+                    <span class="site-footer-meta">&copy; @DateTime.Now.Year Shri Swami Samarth Sahakari Society. All rights reserved.</span>
+                </div>
+            </footer>
         </div>
-    </main>
+    </div>
 
-    <footer class="site-footer">
-        <div class="container site-footer-inner">
-            <a class="site-footer-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                <span class="site-footer-mark">S</span>
-                SwamiSamarthSociety.Web
-            </a>
-            <span class="site-footer-meta">&copy; @DateTime.Now.Year Shri Swami Samarth Sahakari Society. All rights reserved.</span>
-            <div class="site-footer-links">
-                <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                <a asp-area="" asp-controller="Members" asp-action="Index">Members</a>
-                <a asp-area="" asp-controller="Loans" asp-action="Index">Loans</a>
-                <a asp-area="" asp-controller="MonthlyCycles" asp-action="Index">Collection</a>
-            </div>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

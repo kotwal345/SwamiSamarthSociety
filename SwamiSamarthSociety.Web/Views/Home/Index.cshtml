@@ -63,45 +63,69 @@
     </div>
     @if (User.IsInRole(AppRoles.Chairman))
     {
-        <a asp-controller="Members" asp-action="Create" class="btn btn-primary">+ Add Member</a>
+        <a asp-controller="Members" asp-action="Create" class="btn btn-primary">@Icons.Render("plus", "icon-sm")Add Member</a>
     }
 </div>
 
 <div class="stat-row">
     <a asp-controller="MonthlyCycles" asp-action="Index" class="stat-tile accent-primary">
-        <div class="stat-value">₹@Model.TotalCollectedAllTime.ToString("N0")</div>
-        <div class="stat-label">Total Collected (All-Time)</div>
+        <span class="stat-icon">@Icons.Render("trending-up")</span>
+        <span class="stat-body">
+            <span class="stat-value">₹@Model.TotalCollectedAllTime.ToString("N0")</span>
+            <span class="stat-label">Total Collected (All-Time)</span>
+        </span>
     </a>
     <a asp-controller="MonthlyCycles" asp-action="Index" class="stat-tile accent-success">
-        <div class="stat-value">₹@Model.TotalInterestCollected.ToString("N0")</div>
-        <div class="stat-label">Total Interest Earned</div>
+        <span class="stat-icon">@Icons.Render("percent")</span>
+        <span class="stat-body">
+            <span class="stat-value">₹@Model.TotalInterestCollected.ToString("N0")</span>
+            <span class="stat-label">Total Interest Earned</span>
+        </span>
     </a>
     <a asp-controller="MonthlyCycles" asp-action="Index" class="stat-tile accent-accent">
-        <div class="stat-value">₹@Model.TotalShareCollected.ToString("N0")</div>
-        <div class="stat-label">Total Share Collected (All-Time)</div>
+        <span class="stat-icon">@Icons.Render("layers")</span>
+        <span class="stat-body">
+            <span class="stat-value">₹@Model.TotalShareCollected.ToString("N0")</span>
+            <span class="stat-label">Total Share Collected (All-Time)</span>
+        </span>
     </a>
     <a asp-controller="MonthlyCycles" asp-action="Index" class="stat-tile accent-muted">
-        <div class="stat-value">₹@Model.CurrentBankBalance.ToString("N0")</div>
-        <div class="stat-label">Current Bank Balance</div>
+        <span class="stat-icon">@Icons.Render("credit-card")</span>
+        <span class="stat-body">
+            <span class="stat-value">₹@Model.CurrentBankBalance.ToString("N0")</span>
+            <span class="stat-label">Current Bank Balance</span>
+        </span>
     </a>
 </div>
 
 <div class="stat-row">
     <a asp-controller="Members" asp-action="Index" class="stat-tile accent-primary">
-        <div class="stat-value">@Model.TotalMembers</div>
-        <div class="stat-label">Total Members</div>
+        <span class="stat-icon">@Icons.Render("users")</span>
+        <span class="stat-body">
+            <span class="stat-value">@Model.TotalMembers</span>
+            <span class="stat-label">Total Members</span>
+        </span>
     </a>
     <a asp-controller="Members" asp-action="Index" asp-route-status="Active" class="stat-tile accent-success">
-        <div class="stat-value">@Model.ActiveMembers</div>
-        <div class="stat-label">Active Members</div>
+        <span class="stat-icon">@Icons.Render("user-check")</span>
+        <span class="stat-body">
+            <span class="stat-value">@Model.ActiveMembers</span>
+            <span class="stat-label">Active Members</span>
+        </span>
     </a>
     <a asp-controller="Loans" asp-action="Index" asp-route-status="Active" class="stat-tile accent-accent">
-        <div class="stat-value">@Model.ActiveLoansCount</div>
-        <div class="stat-label">Active Loans · ₹@Model.TotalOutstandingPrincipal.ToString("N0") outstanding</div>
+        <span class="stat-icon">@Icons.Render("credit-card")</span>
+        <span class="stat-body">
+            <span class="stat-value">@Model.ActiveLoansCount</span>
+            <span class="stat-label">Active Loans · ₹@Model.TotalOutstandingPrincipal.ToString("N0") outstanding</span>
+        </span>
     </a>
     <a asp-controller="MonthlyCycles" asp-action="Index" class="stat-tile accent-muted">
-        <div class="stat-value">@Model.MonthsTracked mo</div>
-        <div class="stat-label">Tracked Since @SinceLabel() (@RunningLabel())</div>
+        <span class="stat-icon">@Icons.Render("calendar")</span>
+        <span class="stat-body">
+            <span class="stat-value">@Model.MonthsTracked mo</span>
+            <span class="stat-label">Tracked Since @SinceLabel() (@RunningLabel())</span>
+        </span>
     </a>
 </div>
 
@@ -124,7 +148,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18" /><path d="M7 15l4-4 3 3 5-6" /></svg>
             <h3>No collection history yet</h3>
             <p>Open your first monthly cycle to start tracking collections.</p>
-            <a asp-controller="MonthlyCycles" asp-action="OpenNextCycle" class="btn btn-primary mt-2">Open Next Cycle</a>
+            <a asp-controller="MonthlyCycles" asp-action="OpenNextCycle" class="btn btn-primary mt-2">@Icons.Render("plus", "icon-sm")Open Next Cycle</a>
         </div>
     }
     else
@@ -243,7 +267,7 @@
             <p>Add your first society member to get started.</p>
             @if (User.IsInRole(AppRoles.Chairman))
             {
-                <a asp-controller="Members" asp-action="Create" class="btn btn-primary mt-2">+ Add Member</a>
+                <a asp-controller="Members" asp-action="Create" class="btn btn-primary mt-2">@Icons.Render("plus", "icon-sm")Add Member</a>
             }
         </div>
     }
