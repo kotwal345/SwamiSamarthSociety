@@ -58,6 +58,9 @@ namespace SwamiSamarthSociety.Data.Entities
         public decimal InterestAmount { get; set; }
         public decimal ShareAmount { get; set; }
         public decimal PenaltyAmount { get; set; }
+        // Principal left unpaid from the previous installment, demanded back on top of this
+        // month's regular PrincipalAmount instead of silently riding along inside OutstandingPrincipal.
+        public decimal ArrearsAmount { get; set; }
         public decimal TotalAmount { get; set; }
         public decimal PaidAmount { get; set; }
         public decimal ClosingPrincipal { get; set; }

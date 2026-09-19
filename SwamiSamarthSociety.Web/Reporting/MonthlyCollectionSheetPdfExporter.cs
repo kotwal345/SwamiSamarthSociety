@@ -22,7 +22,7 @@ namespace SwamiSamarthSociety.Web.Reporting
         private static readonly string[] Headers =
         {
             "अ. क्र", "सभासदाचे नाव", "शेअर रक्कम", "एकूण शेअर", "मागील कर्ज बाकी रक्कम",
-            "एकूण मुद्दल", "एकूण व्याज", "एकूण रक्कम", "शिल्लक कर्ज"
+            "एकूण मुद्दल", "एकूण व्याज", "दंड", "थकबाकी", "एकूण रक्कम", "शिल्लक कर्ज"
         };
 
         private static readonly string HeaderBg = "#BDD7EE";
@@ -63,6 +63,8 @@ namespace SwamiSamarthSociety.Web.Reporting
                             columns.RelativeColumn();
                             columns.RelativeColumn();
                             columns.RelativeColumn();
+                            columns.RelativeColumn();
+                            columns.RelativeColumn();
                         });
 
                         table.Header(header =>
@@ -75,7 +77,7 @@ namespace SwamiSamarthSociety.Web.Reporting
                         });
 
                         decimal totalShare = 0, totalCumShare = 0, totalOpening = 0, totalPrincipal = 0,
-                            totalInterest = 0, totalAmount = 0, totalRemaining = 0;
+                            totalInterest = 0, totalPenalty = 0, totalArrears = 0, totalAmount = 0, totalRemaining = 0;
 
                         var srNo = 1;
                         foreach (var row in rows)
@@ -92,6 +94,10 @@ namespace SwamiSamarthSociety.Web.Reporting
                                 .Text(row.HasActiveLoan ? $"{row.PrincipalDue:N0}" : "");
                             table.Cell().Background(bg).Border(0.5f).BorderColor(BorderColor).Padding(2).AlignRight()
                                 .Text(row.HasActiveLoan ? $"{row.InterestDue:N0}" : "");
+                            table.Cell().Background(bg).Border(0.5f).BorderColor(BorderColor).Padding(2).AlignRight()
+                                .Text(row.HasActiveLoan && row.PenaltyDue > 0 ? $"{row.PenaltyDue:N0}" : "");
+                            table.Cell().Background(bg).Border(0.5f).BorderColor(BorderColor).Padding(2).AlignRight()
+                                .Text(row.HasActiveLoan && row.ArrearsDue > 0 ? $"{row.ArrearsDue:N0}" : "");
                             table.Cell().Background(TotalAmountBg).Border(0.5f).BorderColor(BorderColor).Padding(2).AlignRight().Text($"{row.TotalAmount:N0}");
                             table.Cell().Background(bg).Border(0.5f).BorderColor(BorderColor).Padding(2).AlignRight()
                                 .Text(row.HasActiveLoan ? $"{row.RemainingBalance:N0}" : "");
@@ -101,6 +107,8 @@ namespace SwamiSamarthSociety.Web.Reporting
                             totalOpening += row.OpeningPrincipal ?? 0;
                             totalPrincipal += row.PrincipalDue ?? 0;
                             totalInterest += row.InterestDue ?? 0;
+                            totalPenalty += row.PenaltyDue ?? 0;
+                            totalArrears += row.ArrearsDue ?? 0;
                             totalAmount += row.TotalAmount;
                             totalRemaining += row.RemainingBalance ?? 0;
                             srNo++;
@@ -117,6 +125,8 @@ namespace SwamiSamarthSociety.Web.Reporting
                         TotalCell($"{totalOpening:N0}");
                         TotalCell($"{totalPrincipal:N0}");
                         TotalCell($"{totalInterest:N0}");
+                        TotalCell($"{totalPenalty:N0}");
+                        TotalCell($"{totalArrears:N0}");
                         TotalCell($"{totalAmount:N0}");
                         TotalCell($"{totalRemaining:N0}");
                     });

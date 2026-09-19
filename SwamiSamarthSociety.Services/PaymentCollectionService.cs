@@ -116,11 +116,10 @@ namespace SwamiSamarthSociety.Services
                     CreatedBy = createdBy
                 });
 
-                // Interest-first split.
-                var interestPaid = Math.Min(installment.PaidAmount, installment.InterestAmount);
-                var principalPaid = Math.Min(installment.PaidAmount - interestPaid, installment.PrincipalAmount);
-                installment.ClosingPrincipal = installment.OpeningPrincipal - principalPaid;
-                installment.Status = interestPaid + principalPaid >= installment.PrincipalAmount + installment.InterestAmount
+                var (interestPaid, penaltyPaid, arrearsPaid, principalPaid) = SplitInstallmentPayment(installment);
+                installment.ClosingPrincipal = installment.OpeningPrincipal - arrearsPaid - principalPaid;
+                installment.Status = interestPaid + penaltyPaid + arrearsPaid + principalPaid
+                    >= installment.InterestAmount + installment.PenaltyAmount + installment.ArrearsAmount + installment.PrincipalAmount
                     ? "Paid"
                     : installment.PaidAmount > 0 ? "PartiallyPaid" : "Pending";
             }
@@ -144,10 +143,9 @@ namespace SwamiSamarthSociety.Services
             decimal totalPrincipalPaid = 0, totalInterestPaid = 0;
             foreach (var installment in installments)
             {
-                var interestPaid = Math.Min(installment.PaidAmount, installment.InterestAmount);
-                var principalPaid = Math.Min(installment.PaidAmount - interestPaid, installment.PrincipalAmount);
+                var (interestPaid, _, arrearsPaid, principalPaid) = SplitInstallmentPayment(installment);
                 totalInterestPaid += interestPaid;
-                totalPrincipalPaid += principalPaid;
+                totalPrincipalPaid += arrearsPaid + principalPaid;
             }
 
             loan.TotalPrincipalPaid = totalPrincipalPaid;
@@ -166,19 +164,38 @@ namespace SwamiSamarthSociety.Services
                 .SumAsync(p => (decimal?)p.PaidAmount) ?? 0m;
 
             var installments = await _db.LoanInstallments.Where(i => i.MonthlyCycleId == cycleId).ToListAsync();
-            decimal totalPrincipal = 0, totalInterest = 0;
+            decimal totalPrincipal = 0, totalInterest = 0, totalPenalty = 0;
             foreach (var installment in installments)
             {
-                var interestPaid = Math.Min(installment.PaidAmount, installment.InterestAmount);
-                var principalPaid = Math.Min(installment.PaidAmount - interestPaid, installment.PrincipalAmount);
+                var (interestPaid, penaltyPaid, arrearsPaid, principalPaid) = SplitInstallmentPayment(installment);
                 totalInterest += interestPaid;
-                totalPrincipal += principalPaid;
+                totalPenalty += penaltyPaid;
+                totalPrincipal += arrearsPaid + principalPaid;
             }
 
             cycle.CollectedShareAmount = collectedShare;
             cycle.PendingShareAmount = cycle.ExpectedShareAmount - collectedShare;
             cycle.TotalPrincipalCollected = totalPrincipal;
             cycle.TotalInterestCollected = totalInterest;
+            cycle.TotalPenaltyCollected = totalPenalty;
+        }
+
+        // Interest-first, then penalty, then arrears (overdue principal from an earlier cycle), then
+        // this cycle's own regular principal -- how one installment's PaidAmount is allocated across
+        // what's actually owed on it. Shared by every place that needs to know how much of a payment
+        // actually reduced principal (loan totals, cycle totals, the installment's own closing
+        // balance) so they can never drift out of sync with each other. Arrears and principal both
+        // count as principal paid -- arrears is just principal that was already overdue.
+        private static (decimal InterestPaid, decimal PenaltyPaid, decimal ArrearsPaid, decimal PrincipalPaid) SplitInstallmentPayment(LoanInstallment installment)
+        {
+            var interestPaid = Math.Min(installment.PaidAmount, installment.InterestAmount);
+            var afterInterest = installment.PaidAmount - interestPaid;
+            var penaltyPaid = Math.Min(afterInterest, installment.PenaltyAmount);
+            var afterPenalty = afterInterest - penaltyPaid;
+            var arrearsPaid = Math.Min(afterPenalty, installment.ArrearsAmount);
+            var afterArrears = afterPenalty - arrearsPaid;
+            var principalPaid = Math.Min(afterArrears, installment.PrincipalAmount);
+            return (interestPaid, penaltyPaid, arrearsPaid, principalPaid);
         }
     }
 }

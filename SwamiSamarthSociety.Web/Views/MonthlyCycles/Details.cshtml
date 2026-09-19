@@ -11,10 +11,12 @@
     var totalOpening = Model.Rows.Sum(r => r.OpeningPrincipal ?? 0m);
     var totalPrincipalDue = Model.Rows.Sum(r => r.PrincipalDue ?? 0m);
     var totalInterestDue = Model.Rows.Sum(r => r.InterestDue ?? 0m);
+    var totalPenaltyDue = Model.Rows.Sum(r => r.PenaltyDue ?? 0m);
+    var totalArrearsDue = Model.Rows.Sum(r => r.ArrearsDue ?? 0m);
     var totalLoanPaid = Model.Rows.Sum(r => r.LoanPaidAmount ?? 0m);
     var totalPaid = Model.Rows.Sum(r => r.TotalPaid);
     var totalRemaining = Model.Rows.Sum(r => r.RemainingBalance ?? 0m);
-    var totalCollection = cycle.CollectedShareAmount + cycle.TotalPrincipalCollected + cycle.TotalInterestCollected + cycle.OpeningBankBalance;
+    var totalCollection = cycle.CollectedShareAmount + cycle.TotalPrincipalCollected + cycle.TotalInterestCollected + cycle.TotalPenaltyCollected + cycle.OpeningBankBalance;
 }
 
 <div class="page-header">
@@ -27,6 +29,12 @@
         </p>
     </div>
     <div class="d-flex flex-wrap gap-2">
+        @if (canEdit)
+        {
+            <form asp-action="RecalculateDue" asp-route-id="@cycle.MonthlyCycleId" method="post">
+                <button type="submit" class="btn btn-outline-secondary" title="Re-check every unpaid row against last cycle's payment status and apply rule (b)'s penalty + arrears where due">@Icons.Render("percent", "icon-sm")Recalculate Penalties &amp; Arrears</button>
+            </form>
+        }
         <a asp-action="ExportExcel" asp-route-id="@cycle.MonthlyCycleId" class="btn btn-outline-primary">@Icons.Render("download", "icon-sm")Export Excel</a>
         <a asp-action="ExportPdf" asp-route-id="@cycle.MonthlyCycleId" class="btn btn-outline-primary">@Icons.Render("file-text", "icon-sm")Export PDF</a>
         <a asp-action="Index" class="btn btn-outline-secondary">All Cycles</a>
@@ -67,7 +75,7 @@
     <div class="stat-tile accent-accent">
         <span class="stat-icon">@Icons.Render("percent")</span>
         <span class="stat-body">
-            <span class="stat-value">₹@cycle.TotalPrincipalCollected.ToString("N0") + ₹@cycle.TotalInterestCollected.ToString("N0")</span>
+            <span class="stat-value">₹@cycle.TotalPrincipalCollected.ToString("N0") + ₹@cycle.TotalInterestCollected.ToString("N0")@(cycle.TotalPenaltyCollected > 0 ? $" + ₹{cycle.TotalPenaltyCollected:N0} penalty" : "")</span>
             <span class="stat-label">Principal + Interest Collected</span>
         </span>
     </div>
@@ -98,6 +106,8 @@
                 <th>Opening Balance</th>
                 <th>Principal Due</th>
                 <th>Interest Due</th>
+                <th>Penalty Due</th>
+                <th>Arrears Due</th>
                 <th>Loan Paid</th>
                 <th>Total Paid</th>
                 <th>Remaining</th>
@@ -137,10 +147,30 @@
                         <td>@(row.HasActiveLoan ? $"₹{row.PrincipalDue:N0}" : "—")</td>
                         <td>@(row.HasActiveLoan ? $"₹{row.InterestDue:N0}" : "—")</td>
                         <td>
+                            @if (row.HasActiveLoan && row.PenaltyDue > 0)
+                            {
+                                <span class="badge bg-warning" title="Late-payment penalty: a % of what was left unpaid on last cycle's installment">₹@row.PenaltyDue.Value.ToString("N0")</span>
+                            }
+                            else
+                            {
+                                <span>@(row.HasActiveLoan ? "—" : "")</span>
+                            }
+                        </td>
+                        <td>
+                            @if (row.HasActiveLoan && row.ArrearsDue > 0)
+                            {
+                                <span class="badge bg-warning" title="Unpaid principal carried over from last cycle, due back on top of this cycle's regular installment">₹@row.ArrearsDue.Value.ToString("N0")</span>
+                            }
+                            else
+                            {
+                                <span>@(row.HasActiveLoan ? "—" : "")</span>
+                            }
+                        </td>
+                        <td>
                             @if (row.HasActiveLoan)
                             {
-                                var loanDefault = row.LoanPaidAmount > 0 ? row.LoanPaidAmount : (row.PrincipalDue ?? 0) + (row.InterestDue ?? 0);
-                                <input form="@formId" class="form-control form-control-sm" type="number" step="0.01" name="loanAmountPaid" value="@loanDefault" title="Loan installment paid" />
+                                var loanDefault = row.LoanPaidAmount > 0 ? row.LoanPaidAmount : (row.PrincipalDue ?? 0) + (row.InterestDue ?? 0) + (row.PenaltyDue ?? 0) + (row.ArrearsDue ?? 0);
+                                <input form="@formId" class="form-control form-control-sm" type="number" step="0.01" name="loanAmountPaid" value="@loanDefault" title="Loan installment paid (principal + interest + penalty + arrears)" />
                             }
                             else
                             {
@@ -157,6 +187,26 @@
                         <td>@(row.HasActiveLoan ? $"₹{row.OpeningPrincipal:N0}" : "—")</td>
                         <td>@(row.HasActiveLoan ? $"₹{row.PrincipalDue:N0}" : "—")</td>
                         <td>@(row.HasActiveLoan ? $"₹{row.InterestDue:N0}" : "—")</td>
+                        <td>
+                            @if (row.HasActiveLoan && row.PenaltyDue > 0)
+                            {
+                                <span class="badge bg-warning" title="Late-payment penalty: a % of what was left unpaid on last cycle's installment">₹@row.PenaltyDue.Value.ToString("N0")</span>
+                            }
+                            else
+                            {
+                                <span>@(row.HasActiveLoan ? "—" : "")</span>
+                            }
+                        </td>
+                        <td>
+                            @if (row.HasActiveLoan && row.ArrearsDue > 0)
+                            {
+                                <span class="badge bg-warning" title="Unpaid principal carried over from last cycle, due back on top of this cycle's regular installment">₹@row.ArrearsDue.Value.ToString("N0")</span>
+                            }
+                            else
+                            {
+                                <span>@(row.HasActiveLoan ? "—" : "")</span>
+                            }
+                        </td>
                         <td class="row-paid-value">@(row.HasActiveLoan ? $"₹{row.LoanPaidAmount:N0}" : "—")</td>
                         <td class="row-paid-value">₹@row.TotalPaid.ToString("N0")</td>
                         <td>@(row.HasActiveLoan ? $"₹{row.RemainingBalance:N0}" : "—")</td>
@@ -172,6 +222,8 @@
                 <td>₹@totalOpening.ToString("N0")</td>
                 <td>₹@totalPrincipalDue.ToString("N0")</td>
                 <td>₹@totalInterestDue.ToString("N0")</td>
+                <td>₹@totalPenaltyDue.ToString("N0")</td>
+                <td>₹@totalArrearsDue.ToString("N0")</td>
                 <td>₹@totalLoanPaid.ToString("N0")</td>
                 <td>₹@totalPaid.ToString("N0")</td>
                 <td>₹@totalRemaining.ToString("N0")</td>

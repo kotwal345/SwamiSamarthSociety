@@ -115,6 +115,18 @@ namespace SwamiSamarthSociety.Web.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = AppRoles.Chairman)]
+        public async Task<IActionResult> RecalculateDue(int id)
+        {
+            var changed = await _cycleService.RecalculateOpenCycleDueAsync();
+            TempData["Success"] = changed > 0
+                ? $"Penalty/arrears re-applied to {changed} member(s)."
+                : "No changes -- every unpaid installment already reflects the current rule.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = AppRoles.Chairman)]
         public async Task<IActionResult> Close(int id, decimal closingBankBalance)
         {
             try

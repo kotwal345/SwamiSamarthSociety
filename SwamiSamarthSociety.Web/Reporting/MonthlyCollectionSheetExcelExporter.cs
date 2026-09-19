@@ -18,7 +18,7 @@ namespace SwamiSamarthSociety.Web.Reporting
         private static readonly string[] Headers =
         {
             "अ. क्र", "सभासदाचे नाव", "शेअर रक्कम", "एकूण शेअर", "मागील कर्ज बाकी रक्कम",
-            "एकूण मुद्दल", "एकूण व्याज", "एकूण रक्कम", "शिल्लक कर्ज"
+            "एकूण मुद्दल", "एकूण व्याज", "दंड", "थकबाकी", "एकूण रक्कम", "शिल्लक कर्ज"
         };
 
         public static byte[] Export(MonthlyCycle cycle, List<MonthlyCycleRow> rows)
@@ -28,7 +28,7 @@ namespace SwamiSamarthSociety.Web.Reporting
             ws.Style.Font.FontName = "Nirmala UI";
             ws.RightToLeft = false;
 
-            const int lastCol = 9;
+            const int lastCol = 11;
 
             ws.Range(1, 1, 2, 7).Merge().Value = "|| श्री स्वामी समर्थ सोसायटी ||\nचिंबळी ता. खेड, जि. पुणे - ४१२ १०५";
             ws.Range(1, 1, 2, 7).Style.Font.SetBold().Font.SetFontSize(14);
@@ -71,12 +71,14 @@ namespace SwamiSamarthSociety.Web.Reporting
                     ws.Cell(r, 5).Value = row.OpeningPrincipal ?? 0;
                     ws.Cell(r, 6).Value = row.PrincipalDue ?? 0;
                     ws.Cell(r, 7).Value = row.InterestDue ?? 0;
-                    ws.Cell(r, 9).Value = row.RemainingBalance ?? 0;
+                    ws.Cell(r, 8).Value = row.PenaltyDue ?? 0;
+                    ws.Cell(r, 9).Value = row.ArrearsDue ?? 0;
+                    ws.Cell(r, 11).Value = row.RemainingBalance ?? 0;
                     ws.Range(r, 1, r, lastCol).Style.Fill.SetBackgroundColor(loanRowFill);
                 }
 
-                ws.Cell(r, 8).Value = row.TotalAmount;
-                ws.Cell(r, 8).Style.Fill.SetBackgroundColor(totalAmountFill);
+                ws.Cell(r, 10).Value = row.TotalAmount;
+                ws.Cell(r, 10).Style.Fill.SetBackgroundColor(totalAmountFill);
 
                 ws.Range(r, 3, r, lastCol).Style.NumberFormat.SetFormat("#,##0");
                 r++;
@@ -91,6 +93,8 @@ namespace SwamiSamarthSociety.Web.Reporting
             ws.Cell(totalRow, 7).FormulaA1 = $"SUM(G{headerRow + 1}:G{totalRow - 1})";
             ws.Cell(totalRow, 8).FormulaA1 = $"SUM(H{headerRow + 1}:H{totalRow - 1})";
             ws.Cell(totalRow, 9).FormulaA1 = $"SUM(I{headerRow + 1}:I{totalRow - 1})";
+            ws.Cell(totalRow, 10).FormulaA1 = $"SUM(J{headerRow + 1}:J{totalRow - 1})";
+            ws.Cell(totalRow, 11).FormulaA1 = $"SUM(K{headerRow + 1}:K{totalRow - 1})";
             ws.Range(totalRow, 1, totalRow, lastCol).Style.Font.SetBold();
             ws.Range(totalRow, 1, totalRow, lastCol).Style.Fill.SetBackgroundColor(XLColor.FromHtml("#C6E0B4"));
             ws.Range(totalRow, 3, totalRow, lastCol).Style.NumberFormat.SetFormat("#,##0");

@@ -22,12 +22,17 @@ namespace SwamiSamarthSociety.Services
         public decimal? OpeningPrincipal { get; set; }
         public decimal? PrincipalDue { get; set; }
         public decimal? InterestDue { get; set; }
+        public decimal? PenaltyDue { get; set; }
+
+        // Principal left unpaid from a previous cycle, demanded back this cycle on top of the regular
+        // installment -- separate from PrincipalDue (this cycle's own regular principal installment).
+        public decimal? ArrearsDue { get; set; }
         public decimal? LoanPaidAmount { get; set; }
         public string? LoanStatus { get; set; }
         public decimal? RemainingBalance { get; set; }
 
-        // Share + principal + interest due this cycle, matching the club's monthly "एकूण रक्कम" column.
-        public decimal TotalAmount => ShareExpected + (PrincipalDue ?? 0) + (InterestDue ?? 0);
+        // Share + principal + interest + penalty + arrears due this cycle, matching the club's monthly "एकूण रक्कम" column.
+        public decimal TotalAmount => ShareExpected + (PrincipalDue ?? 0) + (InterestDue ?? 0) + (PenaltyDue ?? 0) + (ArrearsDue ?? 0);
 
         // Share + loan amount actually collected this cycle -- what the member has physically paid so far.
         public decimal TotalPaid => SharePaid + (LoanPaidAmount ?? 0);
