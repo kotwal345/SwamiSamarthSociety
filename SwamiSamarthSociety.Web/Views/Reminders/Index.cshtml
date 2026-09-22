@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Payment Reminders";
     bool isConfigured = ViewBag.IsConfigured;
+    bool isWhatsAppConfigured = ViewBag.IsWhatsAppConfigured;
     int membersWithoutMobile = ViewBag.MembersWithoutMobile;
 }
 
@@ -31,6 +32,16 @@
     </div>
 }
 
+@if (!isWhatsAppConfigured)
+{
+    <div class="alert alert-danger mb-3">
+        <strong>WhatsApp payment-confirmation messages aren't configured yet.</strong> Add <code>WhatsApp:AccessToken</code>,
+        <code>WhatsApp:PhoneNumberId</code> and <code>WhatsApp:TemplateName</code> to appsettings.json (see the comment
+        at the top of <code>WhatsAppCloudApiSender.cs</code> for the Meta Business setup and template text needed).
+        Until then, saving a payment on the Collection Sheet will log a failed WhatsApp attempt but send nothing.
+    </div>
+}
+
 @if (membersWithoutMobile > 0)
 {
     <div class="alert alert-danger mb-3">
@@ -41,13 +52,13 @@
 
 <div class="panel">
     <div class="form-panel-header">
-        <h1>Recent SMS Log</h1>
-        <p>Most recent 100 reminder attempts, newest first.</p>
+        <h1>Recent Message Log</h1>
+        <p>Most recent 100 reminder and payment-confirmation attempts, newest first.</p>
     </div>
     @if (Model.Count == 0)
     {
         <div class="empty-state">
-            <p>No reminders have been sent yet.</p>
+            <p>No messages have been sent yet.</p>
         </div>
     }
     else
@@ -59,6 +70,7 @@
                     <th>Sent</th>
                     <th>Member</th>
                     <th>Mobile</th>
+                    <th>Channel</th>
                     <th>Type</th>
                     <th>Message</th>
                     <th>Status</th>
@@ -71,6 +83,7 @@
                         <td>@log.SentDate.ToLocalTime().ToString("dd-MMM-yyyy HH:mm")</td>
                         <td>@log.Member.FullName</td>
                         <td>@log.PhoneNumber</td>
+                        <td>@log.Channel</td>
                         <td>@log.ReminderType</td>
                         <td style="max-width:320px;">@log.Message</td>
                         <td><span class="badge @(log.Success ? "bg-success" : "bg-warning")">@(log.Success ? "Sent" : "Failed")</span></td>

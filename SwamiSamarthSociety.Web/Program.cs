@@ -37,6 +37,9 @@ public class Program
         builder.Services.AddScoped<IPaymentReminderService, PaymentReminderService>();
         builder.Services.AddHostedService<MonthlyReminderBackgroundService>();
 
+        builder.Services.AddHttpClient<IWhatsAppSender, WhatsAppCloudApiSender>();
+        builder.Services.AddScoped<IPaymentConfirmationService, PaymentConfirmationService>();
+
         builder.Services.AddControllersWithViews();
 
         var app = builder.Build();

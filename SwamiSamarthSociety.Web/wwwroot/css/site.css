@@ -672,6 +672,54 @@ a.stat-tile:hover, a.stat-tile:focus {
   border-top: 2px solid var(--border-strong);
 }
 
+/* ---------------------------------------------------------
+   Wide data tables (collection sheet): tighter cells, and the
+   first/last column pinned so identity + the Save action stay
+   on screen while the due/paid columns between them scroll.
+   --------------------------------------------------------- */
+.table-dense thead th,
+.table-dense tbody td {
+  padding: 0.6rem 0.65rem;
+  font-size: 0.85rem;
+}
+
+.table-dense thead th:first-child,
+.table-dense tbody td:first-child,
+.table-dense thead th:last-child,
+.table-dense tbody td:last-child {
+  position: sticky;
+  z-index: 2;
+  background: var(--surface);
+}
+
+.table-dense thead th:first-child,
+.table-dense thead th:last-child {
+  z-index: 3;
+  background: #f7f8fc;
+}
+
+.table-dense thead th:first-child,
+.table-dense tbody td:first-child {
+  left: 0;
+  box-shadow: 2px 0 4px -2px rgba(20, 28, 55, 0.14);
+}
+
+.table-dense thead th:last-child,
+.table-dense tbody td:last-child {
+  right: 0;
+  box-shadow: -2px 0 4px -2px rgba(20, 28, 55, 0.14);
+}
+
+.table-dense tbody tr:hover td:first-child,
+.table-dense tbody tr:hover td:last-child {
+  background: #f9fafd;
+}
+
+.table-dense tfoot td:first-child,
+.table-dense tfoot td:last-child {
+  background: #f0f4ea;
+}
+
 .member-avatar {
   display: inline-flex;
   align-items: center;

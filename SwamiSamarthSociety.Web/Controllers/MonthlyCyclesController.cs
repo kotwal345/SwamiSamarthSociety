@@ -11,11 +11,16 @@ namespace SwamiSamarthSociety.Web.Controllers
     {
         private readonly IMonthlyCycleService _cycleService;
         private readonly IPaymentCollectionService _paymentCollectionService;
+        private readonly IPaymentConfirmationService _paymentConfirmationService;
 
-        public MonthlyCyclesController(IMonthlyCycleService cycleService, IPaymentCollectionService paymentCollectionService)
+        public MonthlyCyclesController(
+            IMonthlyCycleService cycleService,
+            IPaymentCollectionService paymentCollectionService,
+            IPaymentConfirmationService paymentConfirmationService)
         {
             _cycleService = cycleService;
             _paymentCollectionService = paymentCollectionService;
+            _paymentConfirmationService = paymentConfirmationService;
         }
 
         public async Task<IActionResult> Index()
@@ -107,6 +112,12 @@ namespace SwamiSamarthSociety.Web.Controllers
             var result = await _paymentCollectionService.RecordPaymentAsync(
                 cycleId, memberId, shareAmountPaid, loanAmountPaid, paymentDate,
                 paymentMethod, receiptNumber, User.Identity?.Name);
+
+            if (result.Success)
+            {
+                var totalPaid = shareAmountPaid + (loanAmountPaid ?? 0);
+                await _paymentConfirmationService.NotifyAsync(memberId, totalPaid, paymentDate);
+            }
 
             TempData[result.Success ? "Success" : "Error"] = result.Success ? "Payment recorded." : result.Error;
             return RedirectToAction(nameof(Details), new { id = cycleId });

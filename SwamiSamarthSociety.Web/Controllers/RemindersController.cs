@@ -26,6 +26,9 @@ namespace SwamiSamarthSociety.Web.Controllers
         {
             ViewBag.IsConfigured = !string.IsNullOrWhiteSpace(_config["Msg91:AuthKey"])
                 && !string.IsNullOrWhiteSpace(_config["Msg91:TemplateId"]);
+            ViewBag.IsWhatsAppConfigured = !string.IsNullOrWhiteSpace(_config["WhatsApp:AccessToken"])
+                && !string.IsNullOrWhiteSpace(_config["WhatsApp:PhoneNumberId"])
+                && !string.IsNullOrWhiteSpace(_config["WhatsApp:TemplateName"]);
 
             var membersWithoutMobile = await _db.Members
                 .Where(m => m.Status == "Active" && string.IsNullOrEmpty(m.MobileNumber))
