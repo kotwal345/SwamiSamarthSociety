@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 namespace SwamiSamarthSociety.Data.Entities
 {
 
-    public class MonthlyCycle
+    public class MonthlyCycle : ITenantScoped
     {
         public int MonthlyCycleId { get; set; }
+        public int SocietyId { get; set; }
         public int Year { get; set; }
         public int Month { get; set; }
         public DateTime StartDate { get; set; }

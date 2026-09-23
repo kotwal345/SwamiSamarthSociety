@@ -1,0 +1,154 @@
+@model List<SocietyListItemViewModel>
+@{
+    ViewData["Title"] = "Societies";
+    var activeCount = Model.Count(s => s.IsActive);
+    var totalMembers = Model.Sum(s => s.MemberCount);
+    var currentHour = DateTime.Now.Hour;
+    string greeting;
+    if (currentHour < 12) greeting = "Good morning";
+    else if (currentHour < 17) greeting = "Good afternoon";
+    else greeting = "Good evening";
+    // Written as char code 64 instead of the at-sign literal -- that character inside a char
+    // literal (even in a comment) confuses the Razor parser's code/markup boundary detection.
+    var atSign = (char)64;
+    var displayName = User.Identity?.Name?.Split(atSign)[0] ?? "there";
+}
+
+<div class="dashboard-hero">
+    <div class="dashboard-hero-content">
+        <div>
+            <span class="dashboard-hero-eyebrow">@Icons.Render("shield", "icon-sm") Vasati24 Platform</span>
+            <h1>@greeting, @displayName</h1>
+            <p>
+                You're hosting @Model.Count society@(Model.Count == 1 ? "" : "ies") on this product, serving
+                @totalMembers member@(totalMembers == 1 ? "" : "s") in total.
+            </p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary">@Icons.Render("plus", "icon-sm")New Society</a>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success mb-3">@TempData["Success"]</div>
+}
+
+<div class="stat-row">
+    <div class="stat-tile accent-primary">
+        <span class="stat-icon">@Icons.Render("layers")</span>
+        <span class="stat-body">
+            <span class="stat-value">@Model.Count</span>
+            <span class="stat-label">Total Societies</span>
+        </span>
+    </div>
+    <div class="stat-tile accent-success">
+        <span class="stat-icon">@Icons.Render("check-circle")</span>
+        <span class="stat-body">
+            <span class="stat-value">@activeCount</span>
+            <span class="stat-label">Active</span>
+        </span>
+    </div>
+    <div class="stat-tile accent-muted">
+        <span class="stat-icon">@Icons.Render("x")</span>
+        <span class="stat-body">
+            <span class="stat-value">@(Model.Count - activeCount)</span>
+            <span class="stat-label">Deactivated</span>
+        </span>
+    </div>
+    <div class="stat-tile accent-accent">
+        <span class="stat-icon">@Icons.Render("users")</span>
+        <span class="stat-body">
+            <span class="stat-value">@totalMembers</span>
+            <span class="stat-label">Members Across All Societies</span>
+        </span>
+    </div>
+</div>
+
+<div class="society-toolbar">
+    <h2>All Societies</h2>
+    @if (Model.Count > 0)
+    {
+        <div class="society-search">
+            @Icons.Render("search")
+            <input type="text" id="societySearch" class="form-control" placeholder="Search by name or code&hellip;" autocomplete="off" />
+        </div>
+    }
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="panel">
+        <div class="empty-state">
+            @Icons.Render("building")
+            <h3>No societies yet</h3>
+            <p>Create your first client society to get started.</p>
+            <a asp-action="Create" class="btn btn-primary mt-2">@Icons.Render("plus", "icon-sm")New Society</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="society-grid" id="societyGrid">
+        @foreach (var s in Model)
+        {
+            <div class="society-card @(s.IsActive ? "" : "is-inactive")" data-search="@($"{s.Name} {s.Code}".ToLowerInvariant())">
+                <div class="society-card-top">
+                    <span class="society-card-avatar">@s.Name.Trim().Substring(0, 1).ToUpper()</span>
+                    <div class="society-card-title">
+                        <h3 title="@s.Name">@s.Name</h3>
+                        <span class="society-code">@s.Code</span>
+                    </div>
+                    <span class="society-card-status">
+                        <span class="badge @(s.IsActive ? "bg-success" : "bg-secondary")">@(s.IsActive ? "Active" : "Deactivated")</span>
+                    </span>
+                </div>
+
+                <div class="society-card-stats">
+                    <div class="society-card-stat">
+                        <span class="value">@s.MemberCount</span>
+                        <span class="label">Members</span>
+                    </div>
+                    <div class="society-card-stat">
+                        <span class="value">@s.CreatedDate.ToString("dd MMM yyyy")</span>
+                        <span class="label">Created</span>
+                    </div>
+                </div>
+
+                <div class="society-card-footer">
+                    <span class="society-created">@Icons.Render("calendar", "icon-sm") Since @s.CreatedDate.ToString("MMM yyyy")</span>
+                    @if (s.IsActive)
+                    {
+                        <form asp-action="Deactivate" asp-route-id="@s.SocietyId" method="post"
+                              onsubmit="return confirm('Deactivate @s.Name? Its users will no longer be able to log in. Data is kept.');">
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">Deactivate</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-action="Reactivate" asp-route-id="@s.SocietyId" method="post">
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Reactivate</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            var input = document.getElementById('societySearch');
+            var grid = document.getElementById('societyGrid');
+            if (!input || !grid) return;
+            var cards = grid.querySelectorAll('.society-card');
+            input.addEventListener('input', function () {
+                var q = input.value.trim().toLowerCase();
+                cards.forEach(function (card) {
+                    var match = card.getAttribute('data-search').indexOf(q) !== -1;
+                    card.style.display = match ? '' : 'none';
+                });
+            });
+        })();
+    </script>
+}

@@ -1,0 +1,237 @@
+@model LandingViewModel
+@{
+    ViewData["Title"] = "Vasati24 -- Society Management, Simplified";
+    Layout = "/Views/Shared/_LandingLayout.cshtml";
+
+    // Built from parts (not typed as a literal "name-at-domain" string) because an at-sign
+    // followed by a letter in this file's markup gets read by Razor as the start of a C#
+    // expression, not plain text -- see the notes on this bug elsewhere in the SuperAdmin
+    // dashboard view.
+    var atSign = (char)64;
+    var contactEmail = "rushikeshkotwal014" + atSign + "gmail.com";
+    var mailtoHref = "mailto:" + contactEmail + "?subject=Vasati24%20-%20Onboard%20our%20society";
+}
+
+<nav class="lp-nav">
+    <div class="lp-container lp-nav-inner">
+        <a class="lp-brand" href="#top">
+            <span class="lp-brand-mark">V</span>
+            <span class="lp-brand-text">Vasati24<small>सभासद व्यवस्थापन प्रणाली</small></span>
+        </a>
+        <ul class="lp-nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#why-us">Why Vasati24</a></li>
+            <li><a href="#contact">Get in touch</a></li>
+        </ul>
+        <div class="lp-nav-actions">
+            <a asp-area="Identity" asp-page="/Account/Login" class="lp-btn lp-btn-primary">
+                @Icons.Render("arrow-right")Login
+            </a>
+        </div>
+    </div>
+</nav>
+
+<header class="lp-hero" id="top">
+    <div class="lp-container lp-hero-inner">
+        <div>
+            <span class="lp-hero-eyebrow">@Icons.Render("layers", "icon-sm") Built for housing &amp; credit societies</span>
+            <h1>Run your society's <span>accounts, loans &amp; members</span> from one place</h1>
+            <p>
+                Vasati24 replaces registers, spreadsheets and WhatsApp reminders sent by hand with one
+                secure system for member records, monthly shares, loan installments, and automatic
+                payment reminders &mdash; in English and Marathi.
+            </p>
+            <div class="lp-hero-actions">
+                <a asp-area="Identity" asp-page="/Account/Login" class="lp-btn lp-btn-primary lp-btn-lg">
+                    @Icons.Render("arrow-right")Login to your society
+                </a>
+                <a href="@mailtoHref" class="lp-btn lp-btn-ghost lp-btn-lg">
+                    @Icons.Render("message-circle")Get in touch
+                </a>
+            </div>
+            <div class="lp-hero-trust">
+                <span>@Icons.Render("check-circle", "icon-sm") Role-based, per-society data isolation</span>
+                <span>@Icons.Render("check-circle", "icon-sm") SMS &amp; WhatsApp reminders</span>
+                <span>@Icons.Render("check-circle", "icon-sm") Marathi-ready</span>
+            </div>
+        </div>
+
+        <div class="lp-mock" aria-hidden="true">
+            <div class="lp-mock-bar">
+                <span class="lp-mock-dot"></span><span class="lp-mock-dot"></span><span class="lp-mock-dot"></span>
+            </div>
+            <div class="lp-mock-body">
+                <div class="lp-mock-stats">
+                    <div class="lp-mock-stat"><b>28</b><span>MEMBERS</span></div>
+                    <div class="lp-mock-stat"><b>&#8377;4.2L</b><span>COLLECTED</span></div>
+                    <div class="lp-mock-stat"><b>6</b><span>ACTIVE LOANS</span></div>
+                </div>
+                <div class="lp-mock-row">
+                    <span class="lp-mock-avatar"></span>
+                    <div style="flex:1;"><div class="lp-mock-line w60"></div></div>
+                    <span class="lp-mock-badge">Paid</span>
+                </div>
+                <div class="lp-mock-row">
+                    <span class="lp-mock-avatar"></span>
+                    <div style="flex:1;"><div class="lp-mock-line w40"></div></div>
+                    <span class="lp-mock-badge">Paid</span>
+                </div>
+                <div class="lp-mock-row">
+                    <span class="lp-mock-avatar"></span>
+                    <div style="flex:1;"><div class="lp-mock-line w30"></div></div>
+                    <span class="lp-mock-badge">Paid</span>
+                </div>
+            </div>
+            <div class="lp-mock-float">
+                <b>@Icons.Render("bell", "icon-sm") Sent</b>
+                <span>Monthly reminders</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="lp-stats-bar">
+    <div class="lp-container lp-stats-grid">
+        <div class="lp-stat">
+            <b>@Model.ActiveSocietyCount</b>
+            <span>Societ@(Model.ActiveSocietyCount == 1 ? "y" : "ies") on Vasati24</span>
+        </div>
+        <div class="lp-stat">
+            <b>@Model.TotalMembersManaged</b>
+            <span>Members Managed</span>
+        </div>
+        <div class="lp-stat">
+            <b>24&#215;7</b>
+            <span>Access, Anywhere</span>
+        </div>
+        <div class="lp-stat">
+            <b>2026</b>
+            <span>Onboarding Societies Since</span>
+        </div>
+    </div>
+</div>
+
+<section class="lp-section" id="features">
+    <div class="lp-container">
+        <div class="lp-section-header">
+            <span class="lp-section-eyebrow">Everything in one place</span>
+            <h2>Built for how societies actually run</h2>
+            <p>From member onboarding to the collection sheet you hand your accountant &mdash; every feature was built for a real society's books, not a generic CRM.</p>
+        </div>
+        <div class="lp-features-grid">
+            <div class="lp-feature-card">
+                <span class="lp-feature-icon">@Icons.Render("users")</span>
+                <h3>Member &amp; Share Records</h3>
+                <p>Every member's details, monthly share amount, and full payment history in one searchable list &mdash; no more flipping through registers.</p>
+            </div>
+            <div class="lp-feature-card">
+                <span class="lp-feature-icon">@Icons.Render("credit-card")</span>
+                <h3>Loans &amp; Installments</h3>
+                <p>Interest, principal, penalties and arrears calculated automatically every cycle, with guarantors and outstanding balances tracked per loan.</p>
+            </div>
+            <div class="lp-feature-card">
+                <span class="lp-feature-icon">@Icons.Render("message-circle")</span>
+                <h3>Automatic Reminders</h3>
+                <p>SMS and WhatsApp payment reminders go out on their own every month &mdash; in Marathi &mdash; so no one has to type them by hand.</p>
+            </div>
+            <div class="lp-feature-card">
+                <span class="lp-feature-icon">@Icons.Render("layers")</span>
+                <h3>Multi-Society Control</h3>
+                <p>Running more than one society? A single SuperAdmin dashboard lets you onboard new societies and hand each one its own isolated login.</p>
+            </div>
+            <div class="lp-feature-card">
+                <span class="lp-feature-icon">@Icons.Render("lock")</span>
+                <h3>Role-Based, Isolated Access</h3>
+                <p>Admins and members see only what they should &mdash; and one society's data is never visible to another, by design, not by convention.</p>
+            </div>
+            <div class="lp-feature-card">
+                <span class="lp-feature-icon">@Icons.Render("file-text")</span>
+                <h3>Print-Ready Reports</h3>
+                <p>Generate the monthly collection sheet as a formatted PDF or Excel file in one click, ready to print or hand to your accountant.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="lp-section lp-section-alt" id="why-us">
+    <div class="lp-container">
+        <div class="lp-section-header">
+            <span class="lp-section-eyebrow">Why Vasati24</span>
+            <h2>Not another generic society app</h2>
+            <p>Vasati24 grew out of running one real society's books &mdash; then became a product because other societies had the exact same problem.</p>
+        </div>
+        <div class="lp-why-grid">
+            <div class="lp-why-card">
+                <span class="lp-why-icon">@Icons.Render("map-pin")</span>
+                <h3>Made for Indian Societies</h3>
+                <p>Marathi-first messaging, share-and-loan bookkeeping the way societies actually keep it &mdash; not a Western property-management template.</p>
+            </div>
+            <div class="lp-why-card">
+                <span class="lp-why-icon">@Icons.Render("zap")</span>
+                <h3>Onboard in a Day</h3>
+                <p>Send us your member list, and your society is live with its own admin login the same day &mdash; no lengthy setup project.</p>
+            </div>
+            <div class="lp-why-card">
+                <span class="lp-why-icon">@Icons.Render("shield")</span>
+                <h3>Your Data, Isolated</h3>
+                <p>Every society's records are walled off from every other's at the database level, not just hidden in the interface.</p>
+            </div>
+            <div class="lp-why-card">
+                <span class="lp-why-icon">@Icons.Render("message-circle")</span>
+                <h3>A Real Person Answers</h3>
+                <p>No support ticket queue &mdash; write to us directly and you'll hear back from the person who built it.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="lp-section" id="contact">
+    <div class="lp-container">
+        <div class="lp-cta">
+            <h2>Ready to move your society's books online?</h2>
+            <p>Tell us a bit about your society and we'll get you set up with your own admin login &mdash; usually the same day.</p>
+            <div class="lp-cta-actions">
+                <a href="@mailtoHref" class="lp-btn lp-btn-light lp-btn-lg">
+                    @Icons.Render("message-circle")Email @contactEmail
+                </a>
+                <a asp-area="Identity" asp-page="/Account/Login" class="lp-btn lp-btn-ghost lp-btn-lg" style="border-color: rgba(255,255,255,0.4); color: #fff;">
+                    Already a client? Login
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="lp-footer">
+    <div class="lp-container">
+        <div class="lp-footer-inner">
+            <div class="lp-footer-brand">
+                <a class="lp-brand" href="#top">
+                    <span class="lp-brand-mark">V</span>
+                    <span class="lp-brand-text">Vasati24</span>
+                </a>
+                <p class="lp-footer-tagline">Member, share, loan and collection management for housing and credit societies.</p>
+            </div>
+            <div class="lp-footer-links">
+                <div class="lp-footer-col">
+                    <h4>Product</h4>
+                    <a href="#features">Features</a>
+                    <a href="#why-us">Why Vasati24</a>
+                </div>
+                <div class="lp-footer-col">
+                    <h4>Account</h4>
+                    <a asp-area="Identity" asp-page="/Account/Login">Login</a>
+                    <a asp-controller="Home" asp-action="Privacy">Privacy</a>
+                </div>
+                <div class="lp-footer-col">
+                    <h4>Contact</h4>
+                    <a href="@mailtoHref">@contactEmail</a>
+                </div>
+            </div>
+        </div>
+        <div class="lp-footer-bottom">
+            <span>&copy; @DateTime.Now.Year Vasati24. All rights reserved.</span>
+            <span>Made for societies across Maharashtra.</span>
+        </div>
+    </div>
+</footer>

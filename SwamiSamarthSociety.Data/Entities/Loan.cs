@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace SwamiSamarthSociety.Data.Entities
 {
-    public class Loan
+    public class Loan : ITenantScoped
     {
         public int LoanId { get; set; }
+        public int SocietyId { get; set; }
         public string LoanNumber { get; set; } = null!;
         public int MemberId { get; set; }
         public Member Member { get; set; } = null!;
@@ -33,9 +34,10 @@ namespace SwamiSamarthSociety.Data.Entities
         public ICollection<LoanInstallment> Installments { get; set; } = new List<LoanInstallment>();
     }
 
-    public class LoanGuarantor
+    public class LoanGuarantor : ITenantScoped
     {
         public int LoanGuarantorId { get; set; }
+        public int SocietyId { get; set; }
         public int LoanId { get; set; }
         public Loan Loan { get; set; } = null!;
         public int GuarantorMemberId { get; set; }
@@ -44,9 +46,10 @@ namespace SwamiSamarthSociety.Data.Entities
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     }
 
-    public class LoanInstallment
+    public class LoanInstallment : ITenantScoped
     {
         public int LoanInstallmentId { get; set; }
+        public int SocietyId { get; set; }
         public int LoanId { get; set; }
         public Loan Loan { get; set; } = null!;
         public int MonthlyCycleId { get; set; }
@@ -70,9 +73,10 @@ namespace SwamiSamarthSociety.Data.Entities
         public ICollection<LoanPayment> Payments { get; set; } = new List<LoanPayment>();
     }
 
-    public class LoanPayment
+    public class LoanPayment : ITenantScoped
     {
         public int LoanPaymentId { get; set; }
+        public int SocietyId { get; set; }
         public int LoanInstallmentId { get; set; }
         public LoanInstallment LoanInstallment { get; set; } = null!;
         public decimal Amount { get; set; }

@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace SwamiSamarthSociety.Data.Entities
 {
-    public class Member
+    public class Member : ITenantScoped
     {
         public int MemberId { get; set; }
+        public int SocietyId { get; set; }
         public string MemberCode { get; set; } = null!;
         public string FullName { get; set; } = null!;
         public string? FullNameMarathi { get; set; }

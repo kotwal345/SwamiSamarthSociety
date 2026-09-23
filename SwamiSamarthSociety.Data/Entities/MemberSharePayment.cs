@@ -5,9 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 namespace SwamiSamarthSociety.Data.Entities
 {
-    public class MemberSharePayment
+    public class MemberSharePayment : ITenantScoped
     {
         public int SharePaymentId { get; set; }
+        public int SocietyId { get; set; }
         public int MemberId { get; set; }
         public Member Member { get; set; } = null!;
         public int MonthlyCycleId { get; set; }

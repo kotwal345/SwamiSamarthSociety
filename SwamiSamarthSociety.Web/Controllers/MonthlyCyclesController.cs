@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SwamiSamarthSociety.Data;
 using SwamiSamarthSociety.Services;
 using SwamiSamarthSociety.Web.Models;
 using SwamiSamarthSociety.Web.Reporting;
@@ -12,16 +14,25 @@ namespace SwamiSamarthSociety.Web.Controllers
         private readonly IMonthlyCycleService _cycleService;
         private readonly IPaymentCollectionService _paymentCollectionService;
         private readonly IPaymentConfirmationService _paymentConfirmationService;
+        private readonly ApplicationDbContext _db;
+        private readonly ICurrentSocietyContext _tenant;
 
         public MonthlyCyclesController(
             IMonthlyCycleService cycleService,
             IPaymentCollectionService paymentCollectionService,
-            IPaymentConfirmationService paymentConfirmationService)
+            IPaymentConfirmationService paymentConfirmationService,
+            ApplicationDbContext db,
+            ICurrentSocietyContext tenant)
         {
             _cycleService = cycleService;
             _paymentCollectionService = paymentCollectionService;
             _paymentConfirmationService = paymentConfirmationService;
+            _db = db;
+            _tenant = tenant;
         }
+
+        private async Task<Data.Entities.Society> GetCurrentSocietyAsync() =>
+            await _db.Societies.FirstAsync(s => s.SocietyId == _tenant.SocietyId);
 
         public async Task<IActionResult> Index()
         {
@@ -49,8 +60,9 @@ namespace SwamiSamarthSociety.Web.Controllers
             if (cycle is null) return NotFound();
 
             var rows = await _cycleService.GetCollectionSheetRowsAsync(id);
-            var bytes = MonthlyCollectionSheetExcelExporter.Export(cycle, rows);
-            var fileName = $"SwamiSamarthSociety_{cycle.Year}-{cycle.Month:D2}.xlsx";
+            var society = await GetCurrentSocietyAsync();
+            var bytes = MonthlyCollectionSheetExcelExporter.Export(society, cycle, rows);
+            var fileName = $"{society.Code}_{cycle.Year}-{cycle.Month:D2}.xlsx";
             return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
@@ -60,12 +72,13 @@ namespace SwamiSamarthSociety.Web.Controllers
             if (cycle is null) return NotFound();
 
             var rows = await _cycleService.GetCollectionSheetRowsAsync(id);
-            var bytes = MonthlyCollectionSheetPdfExporter.Export(cycle, rows);
-            var fileName = $"SwamiSamarthSociety_{cycle.Year}-{cycle.Month:D2}.pdf";
+            var society = await GetCurrentSocietyAsync();
+            var bytes = MonthlyCollectionSheetPdfExporter.Export(society, cycle, rows);
+            var fileName = $"{society.Code}_{cycle.Year}-{cycle.Month:D2}.pdf";
             return File(bytes, "application/pdf", fileName);
         }
 
-        [Authorize(Roles = AppRoles.Chairman)]
+        [Authorize(Roles = AppRoles.SocietyAdmin)]
         public async Task<IActionResult> OpenNextCycle()
         {
             if (await _cycleService.GetOpenCycleAsync() is { } openCycle)
@@ -86,7 +99,7 @@ namespace SwamiSamarthSociety.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = AppRoles.Chairman)]
+        [Authorize(Roles = AppRoles.SocietyAdmin)]
         public async Task<IActionResult> OpenNextCycle(decimal openingBankBalance)
         {
             try
@@ -104,7 +117,7 @@ namespace SwamiSamarthSociety.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = AppRoles.Chairman)]
+        [Authorize(Roles = AppRoles.SocietyAdmin)]
         public async Task<IActionResult> Collect(
             int cycleId, int memberId, decimal shareAmountPaid, decimal? loanAmountPaid,
             DateTime paymentDate, string? paymentMethod, string? receiptNumber)
@@ -125,7 +138,7 @@ namespace SwamiSamarthSociety.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = AppRoles.Chairman)]
+        [Authorize(Roles = AppRoles.SocietyAdmin)]
         public async Task<IActionResult> RecalculateDue(int id)
         {
             var changed = await _cycleService.RecalculateOpenCycleDueAsync();
@@ -137,7 +150,7 @@ namespace SwamiSamarthSociety.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = AppRoles.Chairman)]
+        [Authorize(Roles = AppRoles.SocietyAdmin)]
         public async Task<IActionResult> Close(int id, decimal closingBankBalance)
         {
             try

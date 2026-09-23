@@ -1,11 +1,35 @@
 @using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+@using Microsoft.EntityFrameworkCore
+@using SwamiSamarthSociety.Data
+@using SwamiSamarthSociety.Data.Entities
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@inject ApplicationDbContext Db
 
 <ul class="topbar-user">
 @if (SignInManager.IsSignedIn(User))
 {
     var initial = (User.Identity?.Name ?? "?").Trim().Substring(0, 1).ToUpper();
+    var isSuperAdmin = User.IsInRole(AppRoles.SuperAdmin);
+    string? societyName = null;
+    if (!isSuperAdmin)
+    {
+        var societyIdClaim = User.FindFirst("SocietyId")?.Value;
+        if (int.TryParse(societyIdClaim, out var societyId))
+        {
+            societyName = (await Db.Societies.IgnoreQueryFilters().FirstOrDefaultAsync(s => s.SocietyId == societyId))?.Name;
+        }
+    }
+    if (isSuperAdmin)
+    {
+        <li>
+            <a class="btn-nav-ghost" asp-area="SuperAdmin" asp-controller="Societies" asp-action="Index">SuperAdmin</a>
+        </li>
+    }
+    else if (societyName is not null)
+    {
+        <li><span class="topbar-society-name">@societyName</span></li>
+    }
     <li>
         <a class="user-chip" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage your account">
             <span class="user-chip-avatar">@initial</span>
@@ -22,9 +46,6 @@ else
 {
     <li>
         <a class="btn-nav-ghost" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
-    <li>
-        <a class="btn-nav-solid" asp-area="Identity" asp-page="/Account/Register">Register</a>
     </li>
 }
 </ul>

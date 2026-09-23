@@ -6,18 +6,22 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using SwamiSamarthSociety.Data;
+using SwamiSamarthSociety.Data.Entities;
 
 namespace SwamiSamarthSociety.Web.Areas.Identity.Pages.Account
 {
     public class LoginModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ApplicationDbContext _db;
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
+        public LoginModel(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ApplicationDbContext db)
         {
             _signInManager = signInManager;
             _userManager = userManager;
+            _db = db;
         }
 
         [BindProperty]
@@ -46,12 +50,6 @@ namespace SwamiSamarthSociety.Web.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
 
-            // First-run experience: no account exists yet, so send the visitor straight to sign up.
-            if (!await _userManager.Users.AnyAsync())
-            {
-                return RedirectToPage("./Register", new { returnUrl });
-            }
-
             if (!string.IsNullOrEmpty(ErrorMessage))
             {
                 ModelState.AddModelError(string.Empty, ErrorMessage);
@@ -78,6 +76,31 @@ namespace SwamiSamarthSociety.Web.Areas.Identity.Pages.Account
 
             if (result.Succeeded)
             {
+                // The query filter scopes _userManager/Users to the caller's own tenant, which
+                // isn't populated yet within this same request (the auth cookie was just issued
+                // for the *response*, not applied to HttpContext.User for the rest of this
+                // request) -- so look the user up directly, ignoring the filter, instead.
+                var normalizedEmail = Input.Email.ToUpperInvariant();
+                var user = await _db.Users.IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail);
+
+                if (user?.SocietyId is { } societyId)
+                {
+                    var society = await _db.Societies.IgnoreQueryFilters()
+                        .FirstOrDefaultAsync(s => s.SocietyId == societyId);
+                    if (society is { IsActive: false })
+                    {
+                        await _signInManager.SignOutAsync();
+                        ModelState.AddModelError(string.Empty, "This society's account has been deactivated. Contact the site administrator.");
+                        ReturnUrl = returnUrl;
+                        return Page();
+                    }
+                }
+
+                if (user is { MustChangePassword: true })
+                {
+                    return RedirectToPage("./ChangePassword", new { forced = true });
+                }
                 return LocalRedirect(returnUrl);
             }
 

@@ -31,10 +31,12 @@ namespace SwamiSamarthSociety.Web.Reporting
         private static readonly string TotalAmountBg = "#FFFF00";
         private static readonly string BorderColor = "#B7BEC9";
 
-        public static byte[] Export(MonthlyCycle cycle, List<MonthlyCycleRow> rows) => BuildDocument(cycle, rows).GeneratePdf();
+        public static byte[] Export(Society society, MonthlyCycle cycle, List<MonthlyCycleRow> rows) =>
+            BuildDocument(society, cycle, rows).GeneratePdf();
 
-        public static IDocument BuildDocument(MonthlyCycle cycle, List<MonthlyCycleRow> rows)
+        public static IDocument BuildDocument(Society society, MonthlyCycle cycle, List<MonthlyCycleRow> rows)
         {
+            var titleLine = $"|| {society.NameMarathi ?? society.Name} ||";
             return Document.Create(container =>
             {
                 container.Page(page =>
@@ -45,8 +47,9 @@ namespace SwamiSamarthSociety.Web.Reporting
 
                     page.Header().Background(TitleBg).Padding(5).Column(col =>
                     {
-                        col.Item().AlignCenter().Text("|| श्री स्वामी समर्थ सोसायटी ||").Bold().FontSize(14);
-                        col.Item().AlignCenter().Text("चिंबळी ता. खेड, जि. पुणे - ४१२ १०५").FontSize(9);
+                        col.Item().AlignCenter().Text(titleLine).Bold().FontSize(14);
+                        if (!string.IsNullOrWhiteSpace(society.Address))
+                            col.Item().AlignCenter().Text(society.Address).FontSize(9);
                         col.Item().PaddingTop(2).AlignCenter().Text($"महिना - {MarathiMonths[cycle.Month]} {cycle.Year}").Bold().FontSize(10);
                     });
 

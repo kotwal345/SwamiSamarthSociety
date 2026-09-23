@@ -1,0 +1,34 @@
+@model CreateMemberLoginViewModel
+@{
+    ViewData["Title"] = "Add Member Login";
+}
+
+<div class="page-header">
+    <div>
+        <span class="page-eyebrow">सभासद यादी</span>
+        <h1>Add Member Login</h1>
+        <p class="page-subtitle">Creates a read-only login for this society. A temporary password is shown once after saving.</p>
+    </div>
+</div>
+
+<div class="panel" style="max-width: 600px;">
+    <div class="form-panel-header">
+        <h1>Login details</h1>
+    </div>
+    <form asp-action="Create" method="post" class="panel-pad">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+        <div class="form-grid">
+            <div class="form-field form-field-full">
+                <label class="form-label">Email *</label>
+                <input asp-for="Email" class="form-control" placeholder="member@example.com" required />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create Login</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+</div>

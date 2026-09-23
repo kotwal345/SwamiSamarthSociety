@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace SwamiSamarthSociety.Data.Entities
 {
-    public class AuditLog
+    public class AuditLog : ITenantScoped
     {
         public int AuditLogId { get; set; }
+        public int SocietyId { get; set; }
         public string TableName { get; set; } = null!;
         public int RecordId { get; set; }
         public string Action { get; set; } = null!;
@@ -18,9 +19,10 @@ namespace SwamiSamarthSociety.Data.Entities
         public DateTime ChangedDate { get; set; } = DateTime.UtcNow;
     }
 
-    public class ImportLog
+    public class ImportLog : ITenantScoped
     {
         public int ImportLogId { get; set; }
+        public int SocietyId { get; set; }
         public string FileName { get; set; } = null!;
         public string ImportType { get; set; } = null!;
         public int RowsProcessed { get; set; }

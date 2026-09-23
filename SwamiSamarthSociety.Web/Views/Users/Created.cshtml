@@ -1,0 +1,37 @@
+@model MemberLoginCreatedViewModel
+@{
+    ViewData["Title"] = "Login Created";
+}
+
+<div class="page-header">
+    <div>
+        <span class="page-eyebrow">सभासद यादी</span>
+        <h1>Login created</h1>
+        <p class="page-subtitle">Save these credentials now and share them with the member &mdash; the password won't be shown again.</p>
+    </div>
+</div>
+
+<div class="panel" style="max-width: 620px;">
+    <div class="panel-pad">
+        <div class="alert alert-warning">
+            @Icons.Render("shield", "icon-sm")
+            This password is shown only once. Copy it now.
+        </div>
+
+        <div class="form-grid">
+            <div class="form-field form-field-full">
+                <label class="form-label">Login email</label>
+                <input type="text" class="form-control" value="@Model.Email" readonly onclick="this.select()" />
+            </div>
+            <div class="form-field form-field-full">
+                <label class="form-label">Temporary password</label>
+                <input type="text" class="form-control" value="@Model.TempPassword" readonly onclick="this.select()" style="font-family: monospace; font-size: 1.05em;" />
+                <span class="form-text-hint">They'll be required to set their own password on first login.</span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a asp-action="Index" class="btn btn-primary">Done</a>
+        </div>
+    </div>
+</div>

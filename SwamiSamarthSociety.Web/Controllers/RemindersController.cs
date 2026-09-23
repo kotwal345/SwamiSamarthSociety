@@ -6,9 +6,9 @@ using SwamiSamarthSociety.Services;
 
 namespace SwamiSamarthSociety.Web.Controllers
 {
-    // The whole page (not just sending) is Chairman-only: the log shows every member's phone
-    // number and message text, which regular members shouldn't be able to browse.
-    [Authorize(Roles = AppRoles.Chairman)]
+    // The whole page (not just sending) is SocietyAdmin-only: the log shows every member's
+    // phone number and message text, which regular members shouldn't be able to browse.
+    [Authorize(Roles = AppRoles.SocietyAdmin)]
     public class RemindersController : Controller
     {
         private readonly ApplicationDbContext _db;

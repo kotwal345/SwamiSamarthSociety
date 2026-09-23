@@ -20,7 +20,7 @@
             <p class="page-subtitle">All loans issued to society members.</p>
         }
     </div>
-    @if (User.IsInRole(AppRoles.Chairman))
+    @if (User.IsInRole(AppRoles.SocietyAdmin))
     {
         <a asp-action="Create" class="btn btn-primary">@Icons.Render("plus", "icon-sm")New Loan</a>
     }
@@ -66,7 +66,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
             <h3>No loans yet</h3>
             <p>Create the first loan for a society member.</p>
-            @if (User.IsInRole(AppRoles.Chairman))
+            @if (User.IsInRole(AppRoles.SocietyAdmin))
             {
                 <a asp-action="Create" class="btn btn-primary mt-2">@Icons.Render("plus", "icon-sm")New Loan</a>
             }

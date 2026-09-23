@@ -8,11 +8,13 @@ namespace SwamiSamarthSociety.Services
     {
         private readonly ApplicationDbContext _db;
         private readonly IWhatsAppSender _whatsAppSender;
+        private readonly ICurrentSocietyContext _tenant;
 
-        public PaymentConfirmationService(ApplicationDbContext db, IWhatsAppSender whatsAppSender)
+        public PaymentConfirmationService(ApplicationDbContext db, IWhatsAppSender whatsAppSender, ICurrentSocietyContext tenant)
         {
             _db = db;
             _whatsAppSender = whatsAppSender;
+            _tenant = tenant;
         }
 
         public async Task NotifyAsync(int memberId, decimal amountPaid, DateTime paymentDate, CancellationToken ct = default)
@@ -21,6 +23,11 @@ namespace SwamiSamarthSociety.Services
 
             var member = await _db.Members.FindAsync(new object[] { memberId }, ct);
             if (member is null || string.IsNullOrWhiteSpace(member.MobileNumber)) return;
+
+            var society = _tenant.SocietyId is { } societyId
+                ? await _db.Societies.FirstOrDefaultAsync(s => s.SocietyId == societyId, ct)
+                : null;
+            var societyName = society?.NameMarathi ?? society?.Name ?? "आमची सोसायटी";
 
             var name = member.FullNameMarathi ?? member.FullName;
             var dateText = paymentDate.ToString("dd-MM-yyyy");
@@ -35,7 +42,7 @@ namespace SwamiSamarthSociety.Services
             {
                 MemberId = member.MemberId,
                 PhoneNumber = member.MobileNumber!,
-                Message = $"नमस्कार {name}, || श्री स्वामी समर्थ सोसायटी || आपली दिनांक {dateText} रोजी रु.{amountText} रक्कम जमा झाली आहे. धन्यवाद.",
+                Message = $"नमस्कार {name}, || {societyName} || आपली दिनांक {dateText} रोजी रु.{amountText} रक्कम जमा झाली आहे. धन्यवाद.",
                 ReminderType = "PaymentConfirmation",
                 Channel = "WhatsApp",
                 SentDate = DateTime.UtcNow,

@@ -211,7 +211,7 @@ namespace SwamiSamarthSociety.Services
 
         private async Task<decimal> GetSettingDecimalAsync(string key, decimal fallback)
         {
-            var value = await _db.SocietySettings.Where(s => s.Key == key).Select(s => s.Value).FirstOrDefaultAsync();
+            var value = await _db.AppSettings.Where(s => s.Key == key).Select(s => s.Value).FirstOrDefaultAsync();
             return value is not null && decimal.TryParse(value, out var parsed) ? parsed : fallback;
         }
 

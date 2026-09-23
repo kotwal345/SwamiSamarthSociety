@@ -2,9 +2,10 @@ using System;
 
 namespace SwamiSamarthSociety.Data.Entities
 {
-    public class SmsLog
+    public class SmsLog : ITenantScoped
     {
         public int SmsLogId { get; set; }
+        public int SocietyId { get; set; }
         public int MemberId { get; set; }
         public Member Member { get; set; } = null!;
         public string PhoneNumber { get; set; } = null!;

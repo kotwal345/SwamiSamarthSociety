@@ -11,7 +11,7 @@
         <h1>Monthly Collection</h1>
         <p class="page-subtitle">Open a month to start collecting shares and loan installments.</p>
     </div>
-    @if (!hasOpenCycle && User.IsInRole(AppRoles.Chairman))
+    @if (!hasOpenCycle && User.IsInRole(AppRoles.SocietyAdmin))
     {
         <a asp-action="OpenNextCycle" class="btn btn-primary">@Icons.Render("plus", "icon-sm")Open Next Cycle</a>
     }
@@ -33,7 +33,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
             <h3>No cycles yet</h3>
             <p>Open the first monthly cycle to begin collecting shares and installments.</p>
-            @if (User.IsInRole(AppRoles.Chairman))
+            @if (User.IsInRole(AppRoles.SocietyAdmin))
             {
                 <a asp-action="OpenNextCycle" class="btn btn-primary mt-2">@Icons.Render("plus", "icon-sm")Open Next Cycle</a>
             }

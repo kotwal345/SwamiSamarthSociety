@@ -1,10 +1,12 @@
 namespace SwamiSamarthSociety.Web
 {
-    // The two roles this app knows about: Chairman (full read/write access -- society अध्यक्ष)
-    // and Member (read-only -- everyone else who signs in just to view records).
+    // Three roles: SuperAdmin (the product owner -- creates/deactivates societies, no
+    // SocietyId of their own), SocietyAdmin (full read/write within their one society --
+    // society अध्यक्ष), and Member (read-only within their one society).
     public static class AppRoles
     {
-        public const string Chairman = "Chairman";
+        public const string SuperAdmin = "SuperAdmin";
+        public const string SocietyAdmin = "SocietyAdmin";
         public const string Member = "Member";
     }
 }

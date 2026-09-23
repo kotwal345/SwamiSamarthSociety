@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SwamiSamarthSociety</title>
+    <title>@ViewData["Title"] - Vasati24</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SwamiSamarthSociety.Web.styles.css" asp-append-version="true" />
@@ -17,9 +17,9 @@
         <aside class="sidebar" id="appSidebar">
             <div class="sidebar-brand">
                 <a class="site-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                    <span class="site-brand-mark">S</span>
+                    <span class="site-brand-mark">V</span>
                     <span class="site-brand-text">
-                        Shri Swami Samarth Society
+                        Vasati24
                         <small>सभासद व्यवस्थापन प्रणाली</small>
                     </span>
                 </a>
@@ -27,23 +27,38 @@
             </div>
 
             <nav class="sidebar-nav">
-                <a class="sidebar-link @(currentController == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">
-                    @Icons.Render("home")<span>Dashboard</span>
-                </a>
-                <a class="sidebar-link @(currentController == "Members" ? "active" : "")" asp-area="" asp-controller="Members" asp-action="Index">
-                    @Icons.Render("users")<span>Members</span>
-                </a>
-                <a class="sidebar-link @(currentController == "Loans" ? "active" : "")" asp-area="" asp-controller="Loans" asp-action="Index">
-                    @Icons.Render("credit-card")<span>Loans</span>
-                </a>
-                <a class="sidebar-link @(currentController == "MonthlyCycles" ? "active" : "")" asp-area="" asp-controller="MonthlyCycles" asp-action="Index">
-                    @Icons.Render("calendar")<span>Collection</span>
-                </a>
-                @if (User.IsInRole(AppRoles.Chairman))
+                @{
+                    var currentArea = ViewContext.RouteData.Values["area"]?.ToString();
+                }
+                @if (User.IsInRole(AppRoles.SuperAdmin))
                 {
-                    <a class="sidebar-link @(currentController == "Reminders" ? "active" : "")" asp-area="" asp-controller="Reminders" asp-action="Index">
-                        @Icons.Render("bell")<span>Reminders</span>
+                    <a class="sidebar-link @(currentArea == "SuperAdmin" ? "active" : "")" asp-area="SuperAdmin" asp-controller="Societies" asp-action="Index">
+                        @Icons.Render("layers")<span>Societies</span>
                     </a>
+                }
+                else
+                {
+                    <a class="sidebar-link @(currentController == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">
+                        @Icons.Render("home")<span>Dashboard</span>
+                    </a>
+                    <a class="sidebar-link @(currentController == "Members" ? "active" : "")" asp-area="" asp-controller="Members" asp-action="Index">
+                        @Icons.Render("users")<span>Members</span>
+                    </a>
+                    <a class="sidebar-link @(currentController == "Loans" ? "active" : "")" asp-area="" asp-controller="Loans" asp-action="Index">
+                        @Icons.Render("credit-card")<span>Loans</span>
+                    </a>
+                    <a class="sidebar-link @(currentController == "MonthlyCycles" ? "active" : "")" asp-area="" asp-controller="MonthlyCycles" asp-action="Index">
+                        @Icons.Render("calendar")<span>Collection</span>
+                    </a>
+                    @if (User.IsInRole(AppRoles.SocietyAdmin))
+                    {
+                        <a class="sidebar-link @(currentController == "Reminders" ? "active" : "")" asp-area="" asp-controller="Reminders" asp-action="Index">
+                            @Icons.Render("bell")<span>Reminders</span>
+                        </a>
+                        <a class="sidebar-link @(currentController == "Users" ? "active" : "")" asp-area="" asp-controller="Users" asp-action="Index">
+                            @Icons.Render("user-check")<span>Logins</span>
+                        </a>
+                    }
                 }
                 <div class="sidebar-divider"></div>
                 <a class="sidebar-link" asp-area="" asp-controller="Home" asp-action="Privacy">
@@ -52,7 +67,7 @@
             </nav>
 
             <div class="sidebar-footer">
-                <span>&copy; @DateTime.Now.Year Shri Swami Samarth Sahakari Society</span>
+                <span>&copy; @DateTime.Now.Year Vasati24</span>
             </div>
         </aside>
 
@@ -73,7 +88,7 @@
 
             <footer class="site-footer">
                 <div class="content-container site-footer-inner">
-                    <span class="site-footer-meta">&copy; @DateTime.Now.Year Shri Swami Samarth Sahakari Society. All rights reserved.</span>
+                    <span class="site-footer-meta">&copy; @DateTime.Now.Year Vasati24. All rights reserved.</span>
                 </div>
             </footer>
         </div>

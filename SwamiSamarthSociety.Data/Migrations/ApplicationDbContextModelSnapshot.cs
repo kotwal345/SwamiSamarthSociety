@@ -74,71 +74,6 @@ namespace SwamiSamarthSociety.Data.Migrations
                     b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.ToTable("AspNetUsers", (string)null);
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
                     b.Property<int>("Id")
@@ -224,6 +159,109 @@ namespace SwamiSamarthSociety.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("SwamiSamarthSociety.Data.Entities.AppSetting", b =>
+                {
+                    b.Property<int>("AppSettingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AppSettingId"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("SocietyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("AppSettingId");
+
+                    b.HasIndex("SocietyId", "Key")
+                        .IsUnique();
+
+                    b.ToTable("AppSetting", (string)null);
+                });
+
+            modelBuilder.Entity("SwamiSamarthSociety.Data.Entities.ApplicationUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("MustChangePassword")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("SocietyId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("SocietyId");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
             modelBuilder.Entity("SwamiSamarthSociety.Data.Entities.AuditLog", b =>
                 {
                     b.Property<int>("AuditLogId")
@@ -251,6 +289,9 @@ namespace SwamiSamarthSociety.Data.Migrations
                     b.Property<int>("RecordId")
                         .HasColumnType("int");
 
+                    b.Property<int>("SocietyId")
+                        .HasColumnType("int");
+
                     b.Property<string>("TableName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -274,6 +315,9 @@ namespace SwamiSamarthSociety.Data.Migrations
 
                     b.Property<decimal>("OpeningBalance")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("SocietyId")
+                        .HasColumnType("int");
 
                     b.HasKey("BankAccountId");
 
@@ -311,6 +355,9 @@ namespace SwamiSamarthSociety.Data.Migrations
 
                     b.Property<string>("ReferenceType")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SocietyId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("datetime2");
@@ -359,6 +406,9 @@ namespace SwamiSamarthSociety.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("SocietyId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("datetime2");
 
@@ -403,6 +453,9 @@ namespace SwamiSamarthSociety.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("RowsSucceeded")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SocietyId")
                         .HasColumnType("int");
 
                     b.HasKey("ImportLogId");
@@ -464,6 +517,9 @@ namespace SwamiSamarthSociety.Data.Migrations
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("SocietyId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -476,10 +532,10 @@ namespace SwamiSamarthSociety.Data.Migrations
 
                     b.HasKey("LoanId");
 
-                    b.HasIndex("LoanNumber")
-                        .IsUnique();
-
                     b.HasIndex("MemberId");
+
+                    b.HasIndex("SocietyId", "LoanNumber")
+                        .IsUnique();
 
                     b.ToTable("Loan", (string)null);
                 });
@@ -499,6 +555,9 @@ namespace SwamiSamarthSociety.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("LoanId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SocietyId")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
@@ -562,6 +621,9 @@ namespace SwamiSamarthSociety.Data.Migrations
                     b.Property<decimal>("ShareAmount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("SocietyId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -602,6 +664,9 @@ namespace SwamiSamarthSociety.Data.Migrations
                     b.Property<int?>("NumberOfInstallments")
                         .HasColumnType("int");
 
+                    b.Property<int>("SocietyId")
+                        .HasColumnType("int");
+
                     b.HasKey("LoanInstallmentRuleId");
 
                     b.ToTable("LoanInstallmentRule", (string)null);
@@ -635,6 +700,9 @@ namespace SwamiSamarthSociety.Data.Migrations
 
                     b.Property<string>("ReceiptNumber")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SocietyId")
+                        .HasColumnType("int");
 
                     b.HasKey("LoanPaymentId");
 
@@ -683,13 +751,16 @@ namespace SwamiSamarthSociety.Data.Migrations
                     b.Property<decimal>("MonthlyShareAmount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("SocietyId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("MemberId");
 
-                    b.HasIndex("MemberCode")
+                    b.HasIndex("SocietyId", "MemberCode")
                         .IsUnique();
 
                     b.ToTable("Member", (string)null);
@@ -728,6 +799,9 @@ namespace SwamiSamarthSociety.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("MonthsDeducted")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SocietyId")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
@@ -782,6 +856,9 @@ namespace SwamiSamarthSociety.Data.Migrations
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("SocietyId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -831,6 +908,9 @@ namespace SwamiSamarthSociety.Data.Migrations
                     b.Property<decimal>("PendingShareAmount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("SocietyId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
@@ -855,7 +935,7 @@ namespace SwamiSamarthSociety.Data.Migrations
 
                     b.HasKey("MonthlyCycleId");
 
-                    b.HasIndex("Year", "Month")
+                    b.HasIndex("SocietyId", "Year", "Month")
                         .IsUnique();
 
                     b.ToTable("MonthlyCycle", (string)null);
@@ -894,6 +974,9 @@ namespace SwamiSamarthSociety.Data.Migrations
                     b.Property<DateTime>("SentDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("SocietyId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("Success")
                         .HasColumnType("bit");
 
@@ -904,28 +987,55 @@ namespace SwamiSamarthSociety.Data.Migrations
                     b.ToTable("SmsLog", (string)null);
                 });
 
-            modelBuilder.Entity("SwamiSamarthSociety.Data.Entities.SocietySetting", b =>
+            modelBuilder.Entity("SwamiSamarthSociety.Data.Entities.Society", b =>
                 {
-                    b.Property<int>("SocietySettingId")
+                    b.Property<int>("SocietyId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SocietySettingId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SocietyId"));
 
-                    b.Property<string>("Description")
+                    b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Key")
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ContactEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactPersonName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactPhone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeactivatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Value")
-                        .IsRequired()
+                    b.Property<string>("NameMarathi")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("SocietySettingId");
+                    b.HasKey("SocietyId");
 
-                    b.ToTable("SocietySetting", (string)null);
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("Society", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -939,7 +1049,7 @@ namespace SwamiSamarthSociety.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("SwamiSamarthSociety.Data.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -948,7 +1058,7 @@ namespace SwamiSamarthSociety.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("SwamiSamarthSociety.Data.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -963,7 +1073,7 @@ namespace SwamiSamarthSociety.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("SwamiSamarthSociety.Data.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -972,11 +1082,21 @@ namespace SwamiSamarthSociety.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("SwamiSamarthSociety.Data.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("SwamiSamarthSociety.Data.Entities.ApplicationUser", b =>
+                {
+                    b.HasOne("SwamiSamarthSociety.Data.Entities.Society", "Society")
+                        .WithMany()
+                        .HasForeignKey("SocietyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Society");
                 });
 
             modelBuilder.Entity("SwamiSamarthSociety.Data.Entities.BankTransaction", b =>

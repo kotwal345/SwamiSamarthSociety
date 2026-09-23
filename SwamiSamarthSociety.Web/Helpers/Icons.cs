@@ -29,6 +29,12 @@ namespace SwamiSamarthSociety.Web.Helpers
             ["file-text"] = "<path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"/><polyline points=\"14 2 14 8 20 8\"/><line x1=\"16\" y1=\"13\" x2=\"8\" y2=\"13\"/><line x1=\"16\" y1=\"17\" x2=\"8\" y2=\"17\"/>",
             ["arrow-right"] = "<line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/><polyline points=\"12 5 19 12 12 19\"/>",
             ["send"] = "<line x1=\"22\" y1=\"2\" x2=\"11\" y2=\"13\"/><polygon points=\"22 2 15 22 11 13 2 9 22 2\"/>",
+            ["search"] = "<circle cx=\"11\" cy=\"11\" r=\"7\"/><line x1=\"21\" y1=\"21\" x2=\"16.65\" y2=\"16.65\"/>",
+            ["building"] = "<rect x=\"4\" y=\"2\" width=\"16\" height=\"20\" rx=\"1\"/><line x1=\"9\" y1=\"7\" x2=\"9\" y2=\"7.01\"/><line x1=\"15\" y1=\"7\" x2=\"15\" y2=\"7.01\"/><line x1=\"9\" y1=\"11\" x2=\"9\" y2=\"11.01\"/><line x1=\"15\" y1=\"11\" x2=\"15\" y2=\"11.01\"/><line x1=\"9\" y1=\"15\" x2=\"9\" y2=\"15.01\"/><line x1=\"15\" y1=\"15\" x2=\"15\" y2=\"15.01\"/><path d=\"M9 22v-4h6v4\"/>",
+            ["lock"] = "<rect x=\"3\" y=\"11\" width=\"18\" height=\"11\" rx=\"2\"/><path d=\"M7 11V7a5 5 0 0 1 10 0v4\"/>",
+            ["zap"] = "<polygon points=\"13 2 3 14 12 14 11 22 21 10 12 10 13 2\"/>",
+            ["map-pin"] = "<path d=\"M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/>",
+            ["message-circle"] = "<path d=\"M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z\"/>",
         };
 
         public static IHtmlContent Render(string name, string? cssClass = null)

@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace SwamiSamarthSociety.Data.Entities
 {
-    public class FinancialTransaction
+    public class FinancialTransaction : ITenantScoped
     {
         public int FinancialTransactionId { get; set; }
+        public int SocietyId { get; set; }
         public DateTime TransactionDate { get; set; }
         public string TransactionType { get; set; } = null!;
         public string ReferenceType { get; set; } = null!;

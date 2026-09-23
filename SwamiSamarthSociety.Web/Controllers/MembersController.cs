@@ -28,12 +28,12 @@ namespace SwamiSamarthSociety.Web.Controllers
             return View(member);
         }
 
-        [Authorize(Roles = AppRoles.Chairman)]
+        [Authorize(Roles = AppRoles.SocietyAdmin)]
         public IActionResult Create() => View(new Member { JoiningDate = DateTime.Today });
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = AppRoles.Chairman)]
+        [Authorize(Roles = AppRoles.SocietyAdmin)]
         public async Task<IActionResult> Create(Member member)
         {
             // MemberCode is generated server-side by MemberService.CreateAsync, not submitted by the form.
@@ -44,7 +44,7 @@ namespace SwamiSamarthSociety.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = AppRoles.Chairman)]
+        [Authorize(Roles = AppRoles.SocietyAdmin)]
         public async Task<IActionResult> Edit(int id)
         {
             var member = await _memberService.GetByIdAsync(id);
@@ -54,7 +54,7 @@ namespace SwamiSamarthSociety.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = AppRoles.Chairman)]
+        [Authorize(Roles = AppRoles.SocietyAdmin)]
         public async Task<IActionResult> Edit(int id, Member member)
         {
             if (id != member.MemberId) return BadRequest();

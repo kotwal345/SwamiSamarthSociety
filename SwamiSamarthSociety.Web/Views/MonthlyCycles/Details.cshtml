@@ -3,7 +3,7 @@
     ViewData["Title"] = "Collection Sheet";
     var cycle = Model.Cycle;
     bool isOpen = cycle.Status == "Open";
-    bool canEdit = isOpen && User.IsInRole(AppRoles.Chairman);
+    bool canEdit = isOpen && User.IsInRole(AppRoles.SocietyAdmin);
     string[] monthNames = { "", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
 
     var totalShareDue = Model.Rows.Sum(r => r.ShareExpected);

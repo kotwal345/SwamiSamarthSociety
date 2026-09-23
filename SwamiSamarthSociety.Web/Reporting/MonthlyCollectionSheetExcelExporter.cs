@@ -21,7 +21,7 @@ namespace SwamiSamarthSociety.Web.Reporting
             "एकूण मुद्दल", "एकूण व्याज", "दंड", "थकबाकी", "एकूण रक्कम", "शिल्लक कर्ज"
         };
 
-        public static byte[] Export(MonthlyCycle cycle, List<MonthlyCycleRow> rows)
+        public static byte[] Export(Society society, MonthlyCycle cycle, List<MonthlyCycleRow> rows)
         {
             using var workbook = new XLWorkbook();
             var ws = workbook.Worksheets.Add("Collection Sheet");
@@ -30,7 +30,9 @@ namespace SwamiSamarthSociety.Web.Reporting
 
             const int lastCol = 11;
 
-            ws.Range(1, 1, 2, 7).Merge().Value = "|| श्री स्वामी समर्थ सोसायटी ||\nचिंबळी ता. खेड, जि. पुणे - ४१२ १०५";
+            var titleLine = $"|| {society.NameMarathi ?? society.Name} ||";
+            if (!string.IsNullOrWhiteSpace(society.Address)) titleLine += $"\n{society.Address}";
+            ws.Range(1, 1, 2, 7).Merge().Value = titleLine;
             ws.Range(1, 1, 2, 7).Style.Font.SetBold().Font.SetFontSize(14);
             ws.Range(1, 1, 2, 7).Style.Fill.SetBackgroundColor(XLColor.FromHtml("#C6E0B4"));
             ws.Range(1, 1, 2, 7).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);

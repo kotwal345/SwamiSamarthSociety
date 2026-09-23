@@ -1,0 +1,60 @@
+@model List<UserListItemViewModel>
+@{
+    ViewData["Title"] = "Logins";
+}
+
+<div class="page-header">
+    <div>
+        <span class="page-eyebrow">सभासद यादी</span>
+        <h1>Logins</h1>
+        <p class="page-subtitle">Everyone with a login to this society's account.</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">@Icons.Render("plus", "icon-sm")Add Member Login</a>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="panel">
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /></svg>
+            <h3>No logins yet</h3>
+            <p>Add a login so a member can view their own records.</p>
+            <a asp-action="Create" class="btn btn-primary mt-2">@Icons.Render("plus", "icon-sm")Add Member Login</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="table-panel">
+        <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Model)
+                {
+                    <tr>
+                        <td>@u.Email</td>
+                        <td><span class="badge bg-secondary">@u.Role</span></td>
+                        <td>
+                            @if (u.MustChangePassword)
+                            {
+                                <span class="badge bg-warning text-dark">Password not yet set</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        </div>
+    </div>
+}

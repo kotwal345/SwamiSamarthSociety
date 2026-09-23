@@ -8,16 +8,27 @@ namespace SwamiSamarthSociety.Services
     {
         private readonly ApplicationDbContext _db;
         private readonly ISmsSender _smsSender;
+        private readonly ICurrentSocietyContext _tenant;
 
-        public PaymentReminderService(ApplicationDbContext db, ISmsSender smsSender)
+        public PaymentReminderService(ApplicationDbContext db, ISmsSender smsSender, ICurrentSocietyContext tenant)
         {
             _db = db;
             _smsSender = smsSender;
+            _tenant = tenant;
         }
 
         public async Task<ReminderBatchResult> SendMonthlyRemindersAsync(CancellationToken ct = default)
         {
             var result = new ReminderBatchResult();
+
+            // Members/Loans/MonthlyCycles below are automatically scoped to _tenant.SocietyId by
+            // ApplicationDbContext's global query filter -- the caller (a controller for an
+            // interactive "send now", or MonthlyReminderBackgroundService for the automatic
+            // nightly batch) is responsible for the ambient tenant being set correctly first.
+            var society = _tenant.SocietyId is { } societyId
+                ? await _db.Societies.FirstOrDefaultAsync(s => s.SocietyId == societyId, ct)
+                : null;
+            var societyName = society?.NameMarathi ?? society?.Name ?? "आमची सोसायटी";
 
             var members = await _db.Members.Where(m => m.Status == "Active").ToListAsync(ct);
             var activeLoans = await _db.Loans.Where(l => l.Status == "Active").ToListAsync(ct);
@@ -62,14 +73,14 @@ namespace SwamiSamarthSociety.Services
                     }
                     var total = principal + interest + member.MonthlyShareAmount;
                     var approxNote = exact ? "" : " (अंदाजे)";
-                    message = $"नमस्कार {member.FullNameMarathi ?? member.FullName}, || श्री स्वामी समर्थ सोसायटी || - " +
+                    message = $"नमस्कार {member.FullNameMarathi ?? member.FullName}, || {societyName} || - " +
                               $"या महिन्याचा हप्ता: मुद्दल रु.{principal:N0} + व्याज रु.{interest:N0} + शेअर रु.{member.MonthlyShareAmount:N0} " +
                               $"= एकूण रु.{total:N0}{approxNote}, दि. २० पर्यंत जमा करा.";
                     reminderType = "Loan";
                 }
                 else
                 {
-                    message = $"नमस्कार {member.FullNameMarathi ?? member.FullName}, || श्री स्वामी समर्थ सोसायटी || - " +
+                    message = $"नमस्कार {member.FullNameMarathi ?? member.FullName}, || {societyName} || - " +
                               $"या महिन्याची शेअर रक्कम रु.{member.MonthlyShareAmount:N0} दि. २० पर्यंत जमा करा.";
                     reminderType = "Share";
                 }

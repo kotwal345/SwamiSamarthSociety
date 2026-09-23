@@ -1158,3 +1158,242 @@ code.member-code {
   color: var(--text-muted);
   font-size: 0.82rem;
 }
+
+/* ---------------------------------------------------------
+   SuperAdmin dashboard: gradient hero + society card grid
+   --------------------------------------------------------- */
+.dashboard-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--brand-primary-dark), var(--brand-primary) 55%, var(--brand-primary-light));
+  box-shadow: var(--shadow-lg);
+  padding: 2rem 2.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 88% -20%, rgba(255, 255, 255, 0.22), transparent 55%),
+    radial-gradient(circle at 102% 110%, rgba(224, 138, 44, 0.32), transparent 45%);
+  pointer-events: none;
+}
+
+.dashboard-hero-content {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+.dashboard-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+  margin-bottom: 6px;
+}
+
+.dashboard-hero h1 {
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin: 0 0 6px;
+  color: #fff;
+}
+
+.dashboard-hero p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.94rem;
+  max-width: 48ch;
+}
+
+.dashboard-hero .btn-primary {
+  background: #fff;
+  color: var(--brand-primary-dark);
+  box-shadow: 0 8px 18px -8px rgba(0, 0, 0, 0.35);
+}
+
+.dashboard-hero .btn-primary:hover, .dashboard-hero .btn-primary:focus {
+  background: #f3f4f8;
+  color: var(--brand-primary-dark);
+}
+
+.society-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.society-toolbar h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.society-search {
+  position: relative;
+  width: 260px;
+  max-width: 100%;
+}
+
+.society-search input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem 0.85rem 0.5rem 2.3rem;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  font-size: 0.88rem;
+  background: var(--surface);
+}
+
+.society-search input:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px rgba(44, 74, 158, 0.12);
+}
+
+.society-search .icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 15px;
+  height: 15px;
+  color: var(--text-faint);
+  pointer-events: none;
+}
+
+.society-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.society-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 1.25rem;
+  transition: box-shadow 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
+}
+
+.society-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+.society-card.is-inactive {
+  opacity: 0.72;
+}
+
+.society-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 1rem;
+}
+
+.society-card-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(44, 74, 158, 0.14), rgba(224, 138, 44, 0.14));
+  color: var(--brand-primary);
+  font-weight: 700;
+  font-size: 1.1rem;
+  flex: none;
+}
+
+.society-card-title {
+  min-width: 0;
+}
+
+.society-card-title h3 {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.society-card-title .society-code {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--brand-primary);
+  background: rgba(44, 74, 158, 0.08);
+  border-radius: 6px;
+  padding: 2px 7px;
+}
+
+.society-card-status {
+  margin-left: auto;
+  flex: none;
+}
+
+.society-card-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.society-card-stat {
+  background: var(--page-bg);
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
+}
+
+.society-card-stat .value {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.society-card-stat .label {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-top: 1px;
+}
+
+.society-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
+}
+
+.society-card-footer .society-created {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+}

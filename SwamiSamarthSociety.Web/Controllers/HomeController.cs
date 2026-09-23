@@ -1,6 +1,7 @@
 using System.Diagnostics;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SwamiSamarthSociety.Data;
 using SwamiSamarthSociety.Services;
 using SwamiSamarthSociety.Web.Models;
 
@@ -11,17 +12,38 @@ namespace SwamiSamarthSociety.Web.Controllers
         private readonly IMemberService _memberService;
         private readonly IMonthlyCycleService _monthlyCycleService;
         private readonly ILoanService _loanService;
+        private readonly ApplicationDbContext _db;
 
-        public HomeController(IMemberService memberService, IMonthlyCycleService monthlyCycleService, ILoanService loanService)
+        public HomeController(
+            IMemberService memberService,
+            IMonthlyCycleService monthlyCycleService,
+            ILoanService loanService,
+            ApplicationDbContext db)
         {
             _memberService = memberService;
             _monthlyCycleService = monthlyCycleService;
             _loanService = loanService;
+            _db = db;
         }
 
-        [Authorize]
+        // No [Authorize]: a signed-out visitor sees the public marketing page (Landing) instead
+        // of being bounced straight to the login screen -- signed-in users still get their own
+        // dashboard exactly as before.
         public async Task<IActionResult> Index()
         {
+            if (User.Identity?.IsAuthenticated != true)
+            {
+                var landingVm = new LandingViewModel
+                {
+                    ActiveSocietyCount = await _db.Societies.CountAsync(s => s.IsActive),
+                    TotalMembersManaged = await _db.Members.IgnoreQueryFilters().CountAsync(m => m.Status == "Active")
+                };
+                return View("Landing", landingVm);
+            }
+
+            if (User.IsInRole(AppRoles.SuperAdmin))
+                return RedirectToAction("Index", "Societies", new { area = "SuperAdmin" });
+
             var members = await _memberService.GetAllAsync(includeInactive: true);
             var cycles = await _monthlyCycleService.GetAllAsync(); // newest first
             var loans = await _loanService.GetAllAsync();

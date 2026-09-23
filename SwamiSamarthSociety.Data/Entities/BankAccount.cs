@@ -6,17 +6,19 @@ using System.Threading.Tasks;
 
 namespace SwamiSamarthSociety.Data.Entities
 {
-    public class BankAccount
+    public class BankAccount : ITenantScoped
     {
         public int BankAccountId { get; set; }
+        public int SocietyId { get; set; }
         public string AccountName { get; set; } = null!;
         public decimal OpeningBalance { get; set; }
         public ICollection<BankTransaction> Transactions { get; set; } = new List<BankTransaction>();
     }
 
-    public class BankTransaction
+    public class BankTransaction : ITenantScoped
     {
         public int BankTransactionId { get; set; }
+        public int SocietyId { get; set; }
         public int BankAccountId { get; set; }
         public BankAccount BankAccount { get; set; } = null!;
         public DateTime TransactionDate { get; set; }

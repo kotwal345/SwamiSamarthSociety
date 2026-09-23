@@ -1,0 +1,69 @@
+@model CreateSocietyViewModel
+@{
+    ViewData["Title"] = "New Society";
+}
+
+<div class="page-header">
+    <div>
+        <span class="page-eyebrow">Vasati24</span>
+        <h1>New Society</h1>
+        <p class="page-subtitle">Creates the society and its first SocietyAdmin login. Credentials are shown once after saving.</p>
+    </div>
+</div>
+
+<div class="panel" style="max-width: 760px;">
+    <div class="form-panel-header">
+        <h1>Society details</h1>
+        <p>Fields marked with an asterisk are required.</p>
+    </div>
+    <form asp-action="Create" method="post" class="panel-pad">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+        <div class="form-grid">
+            <div class="form-field form-field-full">
+                <label class="form-label">Society name *</label>
+                <input asp-for="Name" class="form-control" placeholder="e.g. Shree Ganesh Sahakari Society" required />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-field form-field-full">
+                <label class="form-label">Society name (Marathi)</label>
+                <input asp-for="NameMarathi" class="form-control" placeholder="मराठी नाव (SMS/PDF वर वापरले जाते)" />
+                <span class="form-text-hint">Used on SMS/WhatsApp reminders and printed collection sheets. Falls back to the English name if left blank.</span>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Short code *</label>
+                <input asp-for="Code" class="form-control" placeholder="e.g. GANESH" required />
+                <span class="form-text-hint">Used internally and in exported file names. Must be unique.</span>
+                <span asp-validation-for="Code" class="text-danger"></span>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Contact person</label>
+                <input asp-for="ContactPersonName" class="form-control" />
+            </div>
+            <div class="form-field">
+                <label class="form-label">Contact phone</label>
+                <input asp-for="ContactPhone" class="form-control" />
+            </div>
+            <div class="form-field">
+                <label class="form-label">Contact email</label>
+                <input asp-for="ContactEmail" class="form-control" />
+                <span asp-validation-for="ContactEmail" class="text-danger"></span>
+            </div>
+            <div class="form-field form-field-full">
+                <label class="form-label">Address</label>
+                <textarea asp-for="Address" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="form-field form-field-full">
+                <label class="form-label">Admin's email (used as their login) *</label>
+                <input asp-for="AdminEmail" class="form-control" placeholder="admin@example.com" required />
+                <span class="form-text-hint">A SocietyAdmin login is created for this email with a generated temporary password.</span>
+                <span asp-validation-for="AdminEmail" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create Society</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+</div>

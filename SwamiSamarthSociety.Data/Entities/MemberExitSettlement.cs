@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace SwamiSamarthSociety.Data.Entities
 {
-    public class MemberExitSettlement
+    public class MemberExitSettlement : ITenantScoped
     {
         public int MemberExitSettlementId { get; set; }
+        public int SocietyId { get; set; }
         public int MemberId { get; set; }
         public Member Member { get; set; } = null!;
         public DateTime ExitDate { get; set; }

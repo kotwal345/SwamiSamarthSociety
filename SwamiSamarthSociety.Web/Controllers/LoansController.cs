@@ -28,7 +28,7 @@ namespace SwamiSamarthSociety.Web.Controllers
             return View(loan);
         }
 
-        [Authorize(Roles = AppRoles.Chairman)]
+        [Authorize(Roles = AppRoles.SocietyAdmin)]
         public async Task<IActionResult> Create()
         {
             var vm = new LoanCreateViewModel
@@ -42,7 +42,7 @@ namespace SwamiSamarthSociety.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = AppRoles.Chairman)]
+        [Authorize(Roles = AppRoles.SocietyAdmin)]
         public async Task<IActionResult> Create(LoanCreateViewModel vm)
         {
             var errors = ModelState.IsValid
